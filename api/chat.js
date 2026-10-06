@@ -6,7 +6,16 @@ const DEMO_MERCHANTS = [
     address_zh: '台北市大安區永康街41巷26號',
     address_en: 'No. 26, Ln. 41, Yongkang St., Da’an Dist., Taipei',
     category: 'coffee',
+    category_zh: '咖啡・甜點',
+    category_en: 'Coffee · Dessert',
+    description_zh: '永康街巷內的咖啡館，適合在街區散步途中停留喝咖啡、吃甜點。',
+    description_en: 'A café tucked into a Yongkang Street lane, suited for a coffee or dessert break while exploring the district.',
+    hours_zh: '週一–五 12:00–00:00 · 週六–日 11:00–00:00',
+    hours_en: 'Mon–Fri 12:00–00:00 · Sat–Sun 11:00–00:00',
+    phone: '+886223912868',
+    phone_display: '02-2391-2868',
     tags: ['coffee','cafe','quiet','dessert'],
+    photos: [],
     lat: 25.030484,
     lng: 121.530546
   },
@@ -17,7 +26,16 @@ const DEMO_MERCHANTS = [
     address_zh: '台北市大安區永康街15-4號',
     address_en: 'No. 15-4, Yongkang St., Da’an Dist., Taipei',
     category: 'dessert',
+    category_zh: '冰品・甜點',
+    category_en: 'Ice · Dessert',
+    description_zh: '永康街的老字號甜品店，以芋頭與冰品為主要特色。',
+    description_en: 'A long-running Yongkang Street dessert shop known for taro-based sweets and shaved-ice desserts.',
+    hours_zh: '12:00–23:00（Prototype，待主資料表確認）',
+    hours_en: '12:00–23:00 (prototype; pending master-data verification)',
+    phone: '+886223217649',
+    phone_display: '02-2321-7649',
     tags: ['dessert','taro','ice'],
+    photos: [],
     lat: 25.032458,
     lng: 121.529810
   }
@@ -56,6 +74,13 @@ function cardFor(merchant, lang) {
     merchant_id: merchant.id,
     name: lang === 'zh' ? merchant.name_zh : merchant.name_en,
     subtitle: lang === 'zh' ? merchant.address_zh : merchant.address_en,
+    category: merchant.category,
+    category_label: lang === 'zh' ? merchant.category_zh : merchant.category_en,
+    description: lang === 'zh' ? merchant.description_zh : merchant.description_en,
+    hours: lang === 'zh' ? merchant.hours_zh : merchant.hours_en,
+    phone: merchant.phone,
+    phone_display: merchant.phone_display,
+    photos: Array.isArray(merchant.photos) ? merchant.photos : [],
     lat: merchant.lat,
     lng: merchant.lng
   };
@@ -74,8 +99,8 @@ function demoAnswer(question, lang) {
       mode: 'demo',
       answer: langText(
         lang,
-        'AI 1.0 目前使用測試資料。你可以先用下方按鈕驗證「回答 → My Maps 定位」的連動。',
-        'AI 1.0 is currently using prototype data. Use the button below to test answer → My Maps linking.'
+        'AI 1.0 目前使用測試資料。點選推薦店家即可開啟 Merchant Card，測試照片切換、地圖定位、導航與電話操作。',
+        'AI 1.0 is currently using prototype data. Tap a recommendation to test the Merchant Card, photo controls, map view, navigation, and calling.'
       ),
       cards
     };
@@ -85,8 +110,8 @@ function demoAnswer(question, lang) {
     mode: 'demo',
     answer: langText(
       lang,
-      '目前是 AI 問答 1.0 的介面測試版。店家總資料尚未接入；現階段可測試咖啡、甜點，以及「在地圖上查看」的連動。',
-      'This is the AI Q&A 1.0 interface prototype. The full merchant dataset is not connected yet; for now you can test coffee, dessert, and the “View on map” action.'
+      '目前是 AI 問答 1.0 的介面測試版。店家總資料尚未接入；現階段可測試咖啡、甜點與完整 Merchant Card 流程。',
+      'This is the AI Q&A 1.0 interface prototype. The full merchant dataset is not connected yet; for now you can test coffee, dessert, and the complete Merchant Card flow.'
     ),
     cards: []
   };
@@ -124,6 +149,12 @@ async function askOpenAI(question, lang, history) {
     address_zh:m.address_zh,
     address_en:m.address_en,
     category:m.category,
+    category_zh:m.category_zh,
+    category_en:m.category_en,
+    description_zh:m.description_zh,
+    description_en:m.description_en,
+    hours_zh:m.hours_zh,
+    hours_en:m.hours_en,
     tags:m.tags
   }));
 

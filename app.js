@@ -60,6 +60,7 @@ const aiBackdrop = document.getElementById('aiBackdrop');
 const aiPanel = document.getElementById('aiPanel');
 const aiCloseBtn = document.getElementById('aiCloseBtn');
 const aiMessages = document.getElementById('aiMessages');
+const aiMerchantDetail = document.getElementById('aiMerchantDetail');
 const aiQuickPrompts = document.getElementById('aiQuickPrompts');
 const aiForm = document.getElementById('aiForm');
 const aiInput = document.getElementById('aiInput');
@@ -76,6 +77,8 @@ let locationPeekToken = 0;
 let aiHistory = [];
 let aiSending = false;
 let aiInitialized = false;
+let selectedMerchant = null;
+let merchantPhotoIndex = 0;
 
 const LOCATION_ZOOM = 18;
 const LOCATION_HOLD_MS = 2000;
@@ -87,26 +90,40 @@ const AI_COPY = {
     button:'問問 DMYK',
     placeholder:'想找什麼？',
     send:'送出',
-    welcome:'我是 DMYK AI 1.0。可以先問我咖啡、甜點，或測試「在地圖上查看」的連動。',
+    welcome:'我是 DMYK AI 1.0。可以先問我咖啡、甜點；點選推薦店家可開啟完整店家卡。',
     quick:['推薦咖啡','找甜點','你可以做什麼？'],
     map:'在地圖上查看',
+    navigate:'導航',
+    call:'打電話',
+    back:'← 返回推薦',
+    hours:'營業時間',
+    phone:'電話',
     waiting:'正在查詢…',
     error:'目前無法取得回覆，請稍後再試。',
     limit:'今天的測試次數已達上限。',
     showing:'已在地圖上顯示',
+    photoPending:'店家照片待圖庫串接',
+    dataNote:'Prototype 資料；正式版將由 Google Drive Google Sheet 單一資料源驅動。',
     prototype:'Prototype · 店家資料尚在建置'
   },
   en: {
     button:'Ask DMYK',
     placeholder:'What are you looking for?',
     send:'Send',
-    welcome:'I’m DMYK AI 1.0. Ask about coffee or dessert, or try the map-linking action.',
+    welcome:'I’m DMYK AI 1.0. Ask about coffee or dessert; tap a recommendation to open the full merchant card.',
     quick:['Recommend coffee','Find dessert','What can you do?'],
-    map:'View on map',
+    map:'View in Map',
+    navigate:'Navigate',
+    call:'Call',
+    back:'← Back to suggestions',
+    hours:'Hours',
+    phone:'Phone',
     waiting:'Checking…',
     error:'Unable to answer right now. Please try again.',
     limit:'Today’s prototype request limit has been reached.',
     showing:'Showing on map',
+    photoPending:'Merchant photos pending image-library connection',
+    dataNote:'Prototype data; production will use the Google Drive Google Sheet as the single source of truth.',
     prototype:'Prototype · merchant data in progress'
   }
 };
@@ -122,6 +139,7 @@ function applyAiCopy() {
   aiSendBtn.textContent = t.send;
   aiModeLabel.textContent = t.prototype;
   renderAiQuickPrompts();
+  if (selectedMerchant) renderMerchantDetail(selectedMerchant);
 }
 
 function applyOverlayCopy(lang) {
@@ -335,7 +353,15 @@ function openAiPanel() {
   aiPanel.setAttribute('aria-hidden','false');
   aiBackdrop.setAttribute('aria-hidden','false');
   if (!aiInitialized) resetAiConversation();
-  setTimeout(() => aiInput.focus(), 360);
+
+  if (selectedMerchant) {
+    renderMerchantDetail(selectedMerchant);
+    aiPanel.classList.add('is-merchant-view');
+    aiMerchantDetail.classList.remove('is-hidden');
+  } else {
+    showConversationView();
+    setTimeout(() => aiInput.focus(), 360);
+  }
 }
 
 function closeAiPanel() {
@@ -349,10 +375,18 @@ function closeAiPanel() {
 function resetAiConversation() {
   aiHistory = [];
   aiMessages.innerHTML = '';
+  selectedMerchant = null;
+  merchantPhotoIndex = 0;
+  showConversationView();
   aiInitialized = true;
   const t = getAiCopy();
   addAiMessage('assistant', t.welcome);
   renderAiQuickPrompts();
+}
+
+function showConversationView() {
+  aiPanel.classList.remove('is-merchant-view');
+  aiMerchantDetail.classList.add('is-hidden');
 }
 
 function renderAiQuickPrompts() {
@@ -369,6 +403,220 @@ function renderAiQuickPrompts() {
   });
 }
 
+function makeMerchantPlaceholder(card, index) {
+  const title = String(card.name || 'DMYK').replace(/[<>&"]/g,'');
+  const label = getAiCopy().photoPending.replace(/[<>&"]/g,'');
+  const variants = [
+    ['#6f1a21','#c98672'],
+    ['#183b45','#8ab8a8'],
+    ['#4b315f','#c6a6d8']
+  ];
+  const pair = variants[index % variants.length];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${pair[0]}"/><stop offset="1" stop-color="${pair[1]}"/></linearGradient></defs>
+    <rect width="960" height="540" fill="url(#g)"/>
+    <circle cx="760" cy="105" r="150" fill="rgba(255,255,255,.10)"/>
+    <circle cx="145" cy="475" r="230" fill="rgba(255,255,255,.08)"/>
+    <text x="54" y="420" font-family="Arial,sans-serif" font-size="44" font-weight="700" fill="white">${title}</text>
+    <text x="56" y="468" font-family="Arial,sans-serif" font-size="22" fill="rgba(255,255,255,.86)">${label}</text>
+  </svg>`;
+  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+}
+
+function getMerchantPhotos(card) {
+  const supplied = Array.isArray(card.photos) ? card.photos.filter(Boolean) : [];
+  if (supplied.length) return supplied;
+  return [0,1,2].map(index => makeMerchantPlaceholder(card, index));
+}
+
+function updateMerchantHero(card, photos) {
+  const image = aiMerchantDetail.querySelector('.ai-merchant-photo');
+  const index = aiMerchantDetail.querySelector('.ai-photo-index');
+  if (!image || !photos.length) return;
+  merchantPhotoIndex = (merchantPhotoIndex + photos.length) % photos.length;
+  image.src = photos[merchantPhotoIndex];
+  image.alt = `${card.name || ''} ${merchantPhotoIndex + 1}`;
+  if (index) index.textContent = `${merchantPhotoIndex + 1} / ${photos.length}`;
+}
+
+function openMerchantCard(card) {
+  selectedMerchant = card;
+  merchantPhotoIndex = 0;
+  renderMerchantDetail(card);
+  aiPanel.classList.add('is-merchant-view');
+  aiMerchantDetail.classList.remove('is-hidden');
+  aiMerchantDetail.scrollTop = 0;
+}
+
+function backToSuggestions() {
+  selectedMerchant = null;
+  merchantPhotoIndex = 0;
+  showConversationView();
+  aiMessages.scrollTop = aiMessages.scrollHeight;
+}
+
+function navigateToMerchant(card) {
+  const url = new URL('https://www.google.com/maps/dir/');
+  url.searchParams.set('api','1');
+
+  if (Number.isFinite(card.lat) && Number.isFinite(card.lng)) {
+    url.searchParams.set('destination', `${card.lat},${card.lng}`);
+  } else if (card.subtitle) {
+    url.searchParams.set('destination', card.subtitle);
+  } else {
+    return;
+  }
+
+  if (card.google_place_id) {
+    url.searchParams.set('destination_place_id', card.google_place_id);
+  }
+
+  window.open(url.toString(), '_blank', 'noopener');
+}
+
+function callMerchant(card) {
+  if (!card.phone) return;
+  window.location.href = `tel:${String(card.phone).replace(/[^+\d]/g,'')}`;
+}
+
+function renderMerchantDetail(card) {
+  if (!card || !aiMerchantDetail) return;
+  const t = getAiCopy();
+  const photos = getMerchantPhotos(card);
+  aiMerchantDetail.innerHTML = '';
+
+  const shell = document.createElement('article');
+  shell.className = 'ai-merchant-card';
+
+  const back = document.createElement('button');
+  back.type = 'button';
+  back.className = 'ai-merchant-back';
+  back.textContent = t.back;
+  back.addEventListener('click', backToSuggestions);
+  shell.appendChild(back);
+
+  const hero = document.createElement('div');
+  hero.className = 'ai-merchant-hero';
+
+  const image = document.createElement('img');
+  image.className = 'ai-merchant-photo';
+  image.loading = 'eager';
+  hero.appendChild(image);
+
+  const prev = document.createElement('button');
+  prev.type = 'button';
+  prev.className = 'ai-photo-arrow prev';
+  prev.setAttribute('aria-label','Previous photo');
+  prev.textContent = '‹';
+  prev.addEventListener('click', () => {
+    merchantPhotoIndex -= 1;
+    updateMerchantHero(card, photos);
+  });
+  hero.appendChild(prev);
+
+  const next = document.createElement('button');
+  next.type = 'button';
+  next.className = 'ai-photo-arrow next';
+  next.setAttribute('aria-label','Next photo');
+  next.textContent = '›';
+  next.addEventListener('click', () => {
+    merchantPhotoIndex += 1;
+    updateMerchantHero(card, photos);
+  });
+  hero.appendChild(next);
+
+  const counter = document.createElement('div');
+  counter.className = 'ai-photo-index';
+  hero.appendChild(counter);
+  shell.appendChild(hero);
+
+  const body = document.createElement('div');
+  body.className = 'ai-merchant-body';
+
+  const title = document.createElement('div');
+  title.className = 'ai-merchant-title';
+  title.textContent = card.name || '';
+  body.appendChild(title);
+
+  if (card.category_label || card.category) {
+    const category = document.createElement('div');
+    category.className = 'ai-merchant-category';
+    category.textContent = card.category_label || card.category;
+    body.appendChild(category);
+  }
+
+  if (card.description) {
+    const description = document.createElement('div');
+    description.className = 'ai-merchant-description';
+    description.textContent = card.description;
+    body.appendChild(description);
+  }
+
+  const meta = document.createElement('div');
+  meta.className = 'ai-merchant-meta';
+
+  const hoursRow = document.createElement('div');
+  hoursRow.className = 'ai-merchant-meta-row';
+  hoursRow.innerHTML = `<div class="ai-merchant-meta-label"></div><div class="ai-merchant-meta-value"></div>`;
+  hoursRow.children[0].textContent = t.hours;
+  hoursRow.children[1].textContent = card.hours || '—';
+  meta.appendChild(hoursRow);
+
+  const phoneRow = document.createElement('div');
+  phoneRow.className = 'ai-merchant-meta-row';
+  phoneRow.innerHTML = `<div class="ai-merchant-meta-label"></div><div class="ai-merchant-meta-value"></div>`;
+  phoneRow.children[0].textContent = t.phone;
+  phoneRow.children[1].textContent = card.phone_display || card.phone || '—';
+  meta.appendChild(phoneRow);
+
+  body.appendChild(meta);
+
+  if (card.subtitle) {
+    const address = document.createElement('div');
+    address.className = 'ai-merchant-address';
+    address.textContent = card.subtitle;
+    body.appendChild(address);
+  }
+
+  const actions = document.createElement('div');
+  actions.className = 'ai-merchant-actions';
+
+  const viewMap = document.createElement('button');
+  viewMap.type = 'button';
+  viewMap.className = 'ai-merchant-action primary';
+  viewMap.textContent = t.map;
+  viewMap.disabled = !(Number.isFinite(card.lat) && Number.isFinite(card.lng));
+  viewMap.addEventListener('click', () => focusMapFromAI(card.lat, card.lng));
+  actions.appendChild(viewMap);
+
+  const navigate = document.createElement('button');
+  navigate.type = 'button';
+  navigate.className = 'ai-merchant-action';
+  navigate.textContent = t.navigate;
+  navigate.disabled = !(card.subtitle || (Number.isFinite(card.lat) && Number.isFinite(card.lng)));
+  navigate.addEventListener('click', () => navigateToMerchant(card));
+  actions.appendChild(navigate);
+
+  const call = document.createElement('button');
+  call.type = 'button';
+  call.className = 'ai-merchant-action';
+  call.textContent = t.call;
+  call.disabled = !card.phone;
+  call.addEventListener('click', () => callMerchant(card));
+  actions.appendChild(call);
+
+  body.appendChild(actions);
+
+  const note = document.createElement('div');
+  note.className = 'ai-merchant-source-note';
+  note.textContent = t.dataNote;
+  body.appendChild(note);
+
+  shell.appendChild(body);
+  aiMerchantDetail.appendChild(shell);
+  updateMerchantHero(card, photos);
+}
+
 function addAiMessage(role, text, cards = []) {
   const row = document.createElement('div');
   row.className = `ai-message ${role}`;
@@ -381,8 +629,10 @@ function addAiMessage(role, text, cards = []) {
     const list = document.createElement('div');
     list.className = 'ai-card-list';
     cards.forEach(card => {
-      const item = document.createElement('div');
+      const item = document.createElement('button');
+      item.type = 'button';
       item.className = 'ai-card';
+      item.addEventListener('click', () => openMerchantCard(card));
 
       const name = document.createElement('div');
       name.className = 'ai-card-name';
@@ -396,13 +646,11 @@ function addAiMessage(role, text, cards = []) {
         item.appendChild(subtitle);
       }
 
-      if (Number.isFinite(card.lat) && Number.isFinite(card.lng)) {
-        const action = document.createElement('button');
-        action.type = 'button';
-        action.className = 'ai-map-action';
-        action.textContent = getAiCopy().map;
-        action.addEventListener('click', () => focusMapFromAI(card.lat, card.lng));
-        item.appendChild(action);
+      if (card.category_label || card.category) {
+        const category = document.createElement('div');
+        category.className = 'ai-card-category';
+        category.textContent = card.category_label || card.category;
+        item.appendChild(category);
       }
 
       list.appendChild(item);

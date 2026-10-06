@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#910000">
   <title>Dongmen YongKang Guide</title>
-  <link rel="stylesheet" href="style.css?v=22">
+  <link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
   <div class="app-stage">
@@ -42,6 +42,28 @@
         </button>
         <div id="locationStatus" class="location-status" role="status" aria-live="polite"></div>
 
+        <button id="aiBtn" class="ai-btn" type="button" aria-label="Ask DMYK">
+          <span class="ai-btn-mark" aria-hidden="true">AI</span>
+          <span id="aiBtnLabel">問問 DMYK</span>
+        </button>
+
+        <div id="aiBackdrop" class="ai-backdrop" aria-hidden="true"></div>
+        <section id="aiPanel" class="ai-panel" aria-hidden="true" aria-label="DMYK AI">
+          <header class="ai-panel-header">
+            <div>
+              <div class="ai-panel-title">DMYK AI <span class="ai-version">1.0</span></div>
+              <div id="aiModeLabel" class="ai-mode-label">Prototype</div>
+            </div>
+            <button id="aiCloseBtn" class="ai-close-btn" type="button" aria-label="Close AI">×</button>
+          </header>
+          <div id="aiMessages" class="ai-messages" aria-live="polite"></div>
+          <div id="aiQuickPrompts" class="ai-quick-prompts"></div>
+          <form id="aiForm" class="ai-form">
+            <input id="aiInput" class="ai-input" type="text" maxlength="1200" autocomplete="off" placeholder="想找什麼？" aria-label="Ask DMYK">
+            <button id="aiSendBtn" class="ai-send-btn" type="submit">送出</button>
+          </form>
+        </section>
+
         <button id="sideBtn" class="side-btn" type="button" aria-label="Open information panel">
           <img src="assets/Side_btn.svg" alt="">
         </button>
@@ -65,6 +87,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=22"></script>
+  <script src="app.js?v=23"></script>
 </body>
 </html>

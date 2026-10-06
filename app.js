@@ -54,6 +54,17 @@ const locateBtn = document.getElementById('locateBtn');
 const locateLabel = document.getElementById('locateLabel');
 const locationBeacon = document.getElementById('locationBeacon');
 const locationStatus = document.getElementById('locationStatus');
+const aiBtn = document.getElementById('aiBtn');
+const aiBtnLabel = document.getElementById('aiBtnLabel');
+const aiBackdrop = document.getElementById('aiBackdrop');
+const aiPanel = document.getElementById('aiPanel');
+const aiCloseBtn = document.getElementById('aiCloseBtn');
+const aiMessages = document.getElementById('aiMessages');
+const aiQuickPrompts = document.getElementById('aiQuickPrompts');
+const aiForm = document.getElementById('aiForm');
+const aiInput = document.getElementById('aiInput');
+const aiSendBtn = document.getElementById('aiSendBtn');
+const aiModeLabel = document.getElementById('aiModeLabel');
 
 let currentLang = 'zh';
 let locationStatusTimer = null;
@@ -62,10 +73,56 @@ let locationPeekCleanupTimer = null;
 let locationPeekLoadTimer = null;
 let locationPeekActive = false;
 let locationPeekToken = 0;
+let aiHistory = [];
+let aiSending = false;
+let aiInitialized = false;
 
 const LOCATION_ZOOM = 18;
 const LOCATION_HOLD_MS = 2000;
 const LOCATION_RETURN_MS = 720;
+const AI_CLIENT_DAILY_LIMIT = 20;
+
+const AI_COPY = {
+  zh: {
+    button:'問問 DMYK',
+    placeholder:'想找什麼？',
+    send:'送出',
+    welcome:'我是 DMYK AI 1.0。可以先問我咖啡、甜點，或測試「在地圖上查看」的連動。',
+    quick:['推薦咖啡','找甜點','你可以做什麼？'],
+    map:'在地圖上查看',
+    waiting:'正在查詢…',
+    error:'目前無法取得回覆，請稍後再試。',
+    limit:'今天的測試次數已達上限。',
+    showing:'已在地圖上顯示',
+    prototype:'Prototype · 店家資料尚在建置'
+  },
+  en: {
+    button:'Ask DMYK',
+    placeholder:'What are you looking for?',
+    send:'Send',
+    welcome:'I’m DMYK AI 1.0. Ask about coffee or dessert, or try the map-linking action.',
+    quick:['Recommend coffee','Find dessert','What can you do?'],
+    map:'View on map',
+    waiting:'Checking…',
+    error:'Unable to answer right now. Please try again.',
+    limit:'Today’s prototype request limit has been reached.',
+    showing:'Showing on map',
+    prototype:'Prototype · merchant data in progress'
+  }
+};
+
+function getAiCopy() {
+  return AI_COPY[currentLang] || AI_COPY.en;
+}
+
+function applyAiCopy() {
+  const t = getAiCopy();
+  aiBtnLabel.textContent = t.button;
+  aiInput.placeholder = t.placeholder;
+  aiSendBtn.textContent = t.send;
+  aiModeLabel.textContent = t.prototype;
+  renderAiQuickPrompts();
+}
 
 function applyOverlayCopy(lang) {
   const c = COPY[lang] || COPY.en;
@@ -79,6 +136,9 @@ function openMap(lang) {
   cancelLocationPeek(true);
   currentLang = lang;
   applyOverlayCopy(lang);
+  closeAiPanel();
+  resetAiConversation();
+  applyAiCopy();
   mapFrame.src = MAPS[lang];
   languageScreen.classList.add('is-hidden');
   mapScreen.classList.remove('is-hidden');
@@ -88,6 +148,7 @@ function openMap(lang) {
 
 function showLanguagePage() {
   cancelLocationPeek(true);
+  closeAiPanel();
   closeOverlay();
   mapFrame.src = '';
   mapScreen.classList.add('is-hidden');
@@ -268,6 +329,189 @@ function startLocationPeek() {
   );
 }
 
+function openAiPanel() {
+  aiPanel.classList.add('is-visible');
+  aiBackdrop.classList.add('is-visible');
+  aiPanel.setAttribute('aria-hidden','false');
+  aiBackdrop.setAttribute('aria-hidden','false');
+  if (!aiInitialized) resetAiConversation();
+  setTimeout(() => aiInput.focus(), 360);
+}
+
+function closeAiPanel() {
+  aiPanel.classList.remove('is-visible');
+  aiBackdrop.classList.remove('is-visible');
+  aiPanel.setAttribute('aria-hidden','true');
+  aiBackdrop.setAttribute('aria-hidden','true');
+  aiInput.blur();
+}
+
+function resetAiConversation() {
+  aiHistory = [];
+  aiMessages.innerHTML = '';
+  aiInitialized = true;
+  const t = getAiCopy();
+  addAiMessage('assistant', t.welcome);
+  renderAiQuickPrompts();
+}
+
+function renderAiQuickPrompts() {
+  if (!aiQuickPrompts) return;
+  const t = getAiCopy();
+  aiQuickPrompts.innerHTML = '';
+  t.quick.forEach(label => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ai-quick-btn';
+    btn.textContent = label;
+    btn.addEventListener('click', () => submitAiQuestion(label));
+    aiQuickPrompts.appendChild(btn);
+  });
+}
+
+function addAiMessage(role, text, cards = []) {
+  const row = document.createElement('div');
+  row.className = `ai-message ${role}`;
+  const bubble = document.createElement('div');
+  bubble.className = 'ai-bubble';
+  bubble.textContent = text;
+  row.appendChild(bubble);
+
+  if (role === 'assistant' && Array.isArray(cards) && cards.length) {
+    const list = document.createElement('div');
+    list.className = 'ai-card-list';
+    cards.forEach(card => {
+      const item = document.createElement('div');
+      item.className = 'ai-card';
+
+      const name = document.createElement('div');
+      name.className = 'ai-card-name';
+      name.textContent = card.name || '';
+      item.appendChild(name);
+
+      if (card.subtitle) {
+        const subtitle = document.createElement('div');
+        subtitle.className = 'ai-card-subtitle';
+        subtitle.textContent = card.subtitle;
+        item.appendChild(subtitle);
+      }
+
+      if (Number.isFinite(card.lat) && Number.isFinite(card.lng)) {
+        const action = document.createElement('button');
+        action.type = 'button';
+        action.className = 'ai-map-action';
+        action.textContent = getAiCopy().map;
+        action.addEventListener('click', () => focusMapFromAI(card.lat, card.lng));
+        item.appendChild(action);
+      }
+
+      list.appendChild(item);
+    });
+    bubble.appendChild(list);
+  }
+
+  aiMessages.appendChild(row);
+  aiMessages.scrollTop = aiMessages.scrollHeight;
+  return row;
+}
+
+function addAiLoading() {
+  const row = document.createElement('div');
+  row.className = 'ai-message assistant is-loading';
+  const bubble = document.createElement('div');
+  bubble.className = 'ai-bubble';
+  bubble.textContent = getAiCopy().waiting;
+  row.appendChild(bubble);
+  aiMessages.appendChild(row);
+  aiMessages.scrollTop = aiMessages.scrollHeight;
+  return row;
+}
+
+function getAiUsageKey() {
+  const date = new Date().toISOString().slice(0,10);
+  return `dmyk_ai_v1_${date}`;
+}
+
+function canUseAiToday() {
+  try {
+    return Number(localStorage.getItem(getAiUsageKey()) || '0') < AI_CLIENT_DAILY_LIMIT;
+  } catch (_) {
+    return true;
+  }
+}
+
+function incrementAiUsage() {
+  try {
+    const key = getAiUsageKey();
+    localStorage.setItem(key, String(Number(localStorage.getItem(key) || '0') + 1));
+  } catch (_) {}
+}
+
+function focusMapFromAI(lat, lng) {
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+  mapFrame.src = centeredMapUrl(lat, lng);
+  closeAiPanel();
+  showLocationStatus(`${getAiCopy().showing} · DMYK AI`, 2200);
+}
+
+async function submitAiQuestion(rawQuestion) {
+  const question = String(rawQuestion || '').trim();
+  if (!question || aiSending) return;
+
+  if (!canUseAiToday()) {
+    addAiMessage('assistant', getAiCopy().limit);
+    return;
+  }
+
+  addAiMessage('user', question);
+  aiInput.value = '';
+  aiSending = true;
+  aiInput.disabled = true;
+  aiSendBtn.disabled = true;
+  const loadingRow = addAiLoading();
+
+  try {
+    incrementAiUsage();
+    const response = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        question,
+        lang:currentLang,
+        history:aiHistory.slice(-6)
+      })
+    });
+
+    const data = await response.json().catch(() => ({}));
+    loadingRow.remove();
+
+    if (!response.ok) throw new Error(data.error || 'AI request failed');
+
+    const answer = typeof data.answer === 'string' && data.answer.trim()
+      ? data.answer.trim()
+      : getAiCopy().error;
+
+    const cards = Array.isArray(data.cards) ? data.cards : [];
+    addAiMessage('assistant', answer, cards);
+    aiHistory.push({role:'user',content:question},{role:'assistant',content:answer});
+    aiHistory = aiHistory.slice(-8);
+
+    if (data.mode === 'ai') {
+      aiModeLabel.textContent = 'AI · GPT-6 Luna';
+    } else {
+      aiModeLabel.textContent = getAiCopy().prototype;
+    }
+  } catch (_) {
+    if (loadingRow.isConnected) loadingRow.remove();
+    addAiMessage('assistant', getAiCopy().error);
+  } finally {
+    aiSending = false;
+    aiInput.disabled = false;
+    aiSendBtn.disabled = false;
+    aiInput.focus();
+  }
+}
+
 const MASTER_WIDTH = 390;
 const PHONE_BREAKPOINT = 600;
 const appStage = document.querySelector('.app-stage');
@@ -299,6 +543,13 @@ sideBtn.addEventListener('click', openOverlay);
 closeBtn.addEventListener('click', closeOverlay);
 languageBtn.addEventListener('click', showLanguagePage);
 locateBtn.addEventListener('click', startLocationPeek);
+aiBtn.addEventListener('click', openAiPanel);
+aiCloseBtn.addEventListener('click', closeAiPanel);
+aiBackdrop.addEventListener('click', closeAiPanel);
+aiForm.addEventListener('submit', e => {
+  e.preventDefault();
+  submitAiQuestion(aiInput.value);
+});
 overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });
 
 shareBtn.addEventListener('click', async () => {

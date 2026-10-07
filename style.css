@@ -72,9 +72,9 @@ body{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .ai-panel.is-merchant-view .ai-form{display:none}
 .ai-merchant-detail{flex:1;min-height:0;overflow-y:auto;background:#fafafa;-webkit-overflow-scrolling:touch}
 .ai-merchant-card{min-height:100%;background:#fff}
-.ai-merchant-back{position:sticky;top:0;z-index:4;width:100%;min-height:42px;border:0;border-bottom:1px solid #ececec;padding:0 15px;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);color:#333;text-align:left;font-size:12px;font-weight:800;cursor:pointer}
-.ai-merchant-hero{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#e9e5e3}
-.ai-merchant-photo{display:block;width:100%;height:100%;object-fit:cover}
+.ai-merchant-back{position:sticky;top:0;z-index:4;width:100%;min-height:48px;border:0;border-bottom:1px solid #eadede;padding:0 16px;background:rgba(251,247,247,.98);backdrop-filter:blur(8px);color:#7d1118;text-align:left;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.01em}
+.ai-merchant-hero{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:#e9e5e3}
+.ai-merchant-photo{display:block;width:100%;height:100%;object-fit:contain;background:#e9e5e3}
 .ai-photo-arrow{position:absolute;z-index:2;top:50%;width:38px;height:38px;border:0;border-radius:50%;background:rgba(20,20,20,.58);color:#fff;font-size:28px;line-height:1;transform:translateY(-50%);cursor:pointer}
 .ai-photo-arrow.prev{left:10px}
 .ai-photo-arrow.next{right:10px}
@@ -140,6 +140,7 @@ body{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .merchant-focus-action{min-height:46px;border:1px solid rgba(145,0,0,.9);border-radius:23px;padding:0 12px;background:rgba(255,255,255,.97);color:#910000;font-size:12px;font-weight:800;box-shadow:0 3px 12px rgba(0,0,0,.2);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .merchant-focus-action:active{transform:scale(.98)}
 .merchant-focus-action-primary{background:#910000;color:#fff}
+#merchantReturnBtn{background:rgba(255,255,255,.98);border-width:1.5px;font-size:13px;box-shadow:0 3px 12px rgba(0,0,0,.22)}
 .map-screen.is-merchant-focus .locate-btn,
 .map-screen.is-merchant-focus .ai-btn,
 .map-screen.is-merchant-focus .side-btn,

@@ -167,6 +167,7 @@ let locationPeekActive = false;
 let locationPeekToken = 0;
 let aiHistory = [];
 let aiSending = false;
+let aiTouchSendPending = false;
 let aiInitialized = false;
 let selectedMerchant = null;
 let merchantPhotoIndex = 0;
@@ -598,13 +599,13 @@ function makeMerchantPlaceholder(card, index) {
     ['#4b315f','#c6a6d8']
   ];
   const pair = variants[index % variants.length];
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720">
     <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${pair[0]}"/><stop offset="1" stop-color="${pair[1]}"/></linearGradient></defs>
     <rect width="960" height="540" fill="url(#g)"/>
     <circle cx="760" cy="105" r="150" fill="rgba(255,255,255,.10)"/>
-    <circle cx="145" cy="475" r="230" fill="rgba(255,255,255,.08)"/>
-    <text x="54" y="420" font-family="Arial,sans-serif" font-size="44" font-weight="700" fill="white">${title}</text>
-    <text x="56" y="468" font-family="Arial,sans-serif" font-size="22" fill="rgba(255,255,255,.86)">${label}</text>
+    <circle cx="145" cy="655" r="230" fill="rgba(255,255,255,.08)"/>
+    <text x="54" y="590" font-family="Arial,sans-serif" font-size="44" font-weight="700" fill="white">${title}</text>
+    <text x="56" y="638" font-family="Arial,sans-serif" font-size="22" fill="rgba(255,255,255,.86)">${label}</text>
   </svg>`;
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
 }
@@ -1339,8 +1340,20 @@ merchantNavigateBtn.addEventListener('click', () => {
   if (selectedMerchant) navigateToMerchant(selectedMerchant);
 });
 merchantReturnBtn.addEventListener('click', returnToDongDong);
+aiSendBtn.addEventListener('pointerdown', e => {
+  if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return;
+  e.preventDefault();
+  if (aiTouchSendPending || aiSending) return;
+
+  const question = aiInput.value;
+  aiTouchSendPending = true;
+  submitAiQuestion(question);
+  setTimeout(() => { aiTouchSendPending = false; }, 450);
+});
+
 aiForm.addEventListener('submit', e => {
   e.preventDefault();
+  if (aiTouchSendPending) return;
   submitAiQuestion(aiInput.value);
 });
 overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });

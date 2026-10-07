@@ -120,3 +120,27 @@ body{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .overlay-btn{min-height:50px;border:1px solid rgba(255,255,255,.68);border-radius:25px;background:#fff;color:#910000;font-weight:700;font-size:16px;cursor:pointer}
 .overlay-btn-secondary{background:transparent;color:#fff}
 @media(max-width:340px){.overlay-inner{width:100vw}.overlay-content{padding-left:16px;padding-right:16px}.overlay-description{font-size:15.5px;line-height:1.65}.locate-btn{right:10px;max-width:220px;font-size:12px}.ai-btn{left:10px;padding-right:10px}.ai-panel{min-height:470px;height:84%}}
+
+
+/* Merchant Focus Mode */
+.merchant-focus-layer{position:absolute;inset:0;z-index:16;visibility:hidden;pointer-events:none}
+.merchant-focus-layer.is-active{visibility:visible}
+.merchant-focus-beacon{position:absolute;left:50%;top:50%;width:58px;height:58px;transform:translate(-50%,-50%);pointer-events:none;opacity:1;transition:opacity .28s ease,transform .28s ease}
+.merchant-focus-beacon.is-hidden{opacity:0;transform:translate(-50%,-50%) scale(.86)}
+.merchant-focus-label{position:absolute;left:50%;bottom:72px;min-width:180px;max-width:280px;transform:translateX(-50%);padding:9px 12px 10px;border-radius:14px;background:rgba(25,25,25,.9);color:#fff;text-align:center;box-shadow:0 3px 14px rgba(0,0,0,.25);backdrop-filter:blur(7px)}
+.merchant-focus-name{font-size:13px;line-height:1.3;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.merchant-focus-distance{margin-top:3px;font-size:10.5px;line-height:1.3;color:rgba(255,255,255,.82)}
+.merchant-focus-pointer{position:absolute;left:50%;bottom:-7px;width:14px;height:14px;background:rgba(25,25,25,.9);transform:translateX(-50%) rotate(45deg)}
+.merchant-focus-ring{position:absolute;inset:0;border:3px solid rgba(145,0,0,.82);border-radius:50%;opacity:0}
+.merchant-focus-ring-a{animation:merchantFocusPulse .78s ease-out 3}
+.merchant-focus-ring-b{animation:merchantFocusPulse .78s ease-out .18s 3}
+.merchant-focus-core{position:absolute;left:50%;top:50%;width:18px;height:18px;border:4px solid #fff;border-radius:50%;background:#910000;transform:translate(-50%,-50%);box-shadow:0 2px 9px rgba(0,0,0,.35)}
+@keyframes merchantFocusPulse{0%{transform:scale(.38);opacity:.95}75%{transform:scale(1.25);opacity:.22}100%{transform:scale(1.45);opacity:0}}
+.merchant-focus-actions{position:absolute;left:14px;right:14px;bottom:max(22px,env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr;gap:9px;pointer-events:auto}
+.merchant-focus-action{min-height:46px;border:1px solid rgba(145,0,0,.9);border-radius:23px;padding:0 12px;background:rgba(255,255,255,.97);color:#910000;font-size:12px;font-weight:800;box-shadow:0 3px 12px rgba(0,0,0,.2);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.merchant-focus-action:active{transform:scale(.98)}
+.merchant-focus-action-primary{background:#910000;color:#fff}
+.map-screen.is-merchant-focus .locate-btn,
+.map-screen.is-merchant-focus .ai-btn,
+.map-screen.is-merchant-focus .side-btn,
+.map-screen.is-merchant-focus .location-status{opacity:0;visibility:hidden;pointer-events:none}

@@ -39,6 +39,82 @@ const COPY = {
   }
 };
 
+
+const DEMO_MERCHANTS = [
+  {
+    id:'DMYK-DEMO-001',
+    name_zh:'YABOO Cafe 鴉埠咖啡',
+    name_en:'YABOO Cafe',
+    address_zh:'台北市大安區永康街41巷26號',
+    address_en:'No. 26, Ln. 41, Yongkang St., Da’an Dist., Taipei',
+    category:'coffee',
+    category_zh:'咖啡・甜點',
+    category_en:'Coffee · Dessert',
+    description_zh:'永康街巷內的咖啡館。此為 Sandbox 沙盤示範資料，用來測試推薦、店家卡片與行動按鈕。',
+    description_en:'A sandbox merchant used to test recommendations, merchant cards and actions.',
+    hours_zh:'12:00–22:00（Mock）',
+    hours_en:'12:00–22:00 (Mock)',
+    phone:'+886223912868',
+    phone_display:'02-2391-2868',
+    tags:['咖啡','coffee','cafe','安靜','quiet','甜點','dessert'],
+    lat:25.030484,lng:121.530546
+  },
+  {
+    id:'DMYK-DEMO-002',
+    name_zh:'永康芋頭大王',
+    name_en:'Yongkang Taro King',
+    address_zh:'台北市大安區永康街15-4號',
+    address_en:'No. 15-4, Yongkang St., Da’an Dist., Taipei',
+    category:'dessert',
+    category_zh:'冰品・甜點',
+    category_en:'Ice · Dessert',
+    description_zh:'芋頭與冰品類型的 Sandbox 示範店家，用來測試甜點搜尋與店家卡片。',
+    description_en:'A mock dessert merchant used for sandbox UX testing.',
+    hours_zh:'12:00–23:00（Mock）',
+    hours_en:'12:00–23:00 (Mock)',
+    phone:'+886223217649',
+    phone_display:'02-2321-7649',
+    tags:['甜點','dessert','芋頭','taro','冰','ice'],
+    lat:25.032458,lng:121.529810
+  },
+  {
+    id:'DMYK-DEMO-003',
+    name_zh:'咚咚測試咖啡 B',
+    name_en:'DongDong Demo Cafe B',
+    address_zh:'東門永康商圈（Mock）',
+    address_en:'Dongmen YongKang District (Mock)',
+    category:'coffee',
+    category_zh:'咖啡・輕食',
+    category_en:'Coffee · Light bites',
+    description_zh:'第二間咖啡館示範資料，專門用來測試多店推薦與「返回推薦」流程。',
+    description_en:'A second mock café used to test multiple recommendations and back navigation.',
+    hours_zh:'10:30–19:30（Mock）',
+    hours_en:'10:30–19:30 (Mock)',
+    phone:'+886200000003',
+    phone_display:'02-0000-0003',
+    tags:['咖啡','coffee','cafe','輕食'],
+    lat:25.033200,lng:121.529200
+  },
+  {
+    id:'DMYK-DEMO-004',
+    name_zh:'咚咚測試咖啡 C',
+    name_en:'DongDong Demo Cafe C',
+    address_zh:'東門永康商圈（Mock）',
+    address_en:'Dongmen YongKang District (Mock)',
+    category:'coffee',
+    category_zh:'咖啡・下午茶',
+    category_en:'Coffee · Afternoon tea',
+    description_zh:'第三間咖啡館示範資料，用來測試三筆建議、比較與店家卡切換。',
+    description_en:'A third mock café used to test three-result recommendations.',
+    hours_zh:'11:00–20:00（Mock）',
+    hours_en:'11:00–20:00 (Mock)',
+    phone:'+886200000004',
+    phone_display:'02-0000-0004',
+    tags:['咖啡','coffee','cafe','下午茶'],
+    lat:25.031900,lng:121.531200
+  }
+];
+
 const languageScreen = document.getElementById('languageScreen');
 const mapScreen = document.getElementById('mapScreen');
 const mapFrame = document.getElementById('mapFrame');
@@ -87,10 +163,10 @@ const AI_CLIENT_DAILY_LIMIT = 20;
 
 const AI_COPY = {
   zh: {
-    button:'問問 DMYK',
+    button:'問咚咚',
     placeholder:'想找什麼？',
     send:'送出',
-    welcome:'我是 DMYK AI 1.0。可以先問我咖啡、甜點；點選推薦店家可開啟完整店家卡。',
+    welcome:'嗨，我是咚咚。現在是 Sandbox 沙盤模式，可以直接推演咖啡、甜點推薦與完整店家卡流程。',
     quick:['推薦咖啡','找甜點','你可以做什麼？'],
     map:'在地圖上查看',
     navigate:'導航',
@@ -98,19 +174,19 @@ const AI_COPY = {
     back:'← 返回推薦',
     hours:'營業時間',
     phone:'電話',
-    waiting:'正在查詢…',
+    waiting:'咚咚正在想…',
     error:'目前無法取得回覆，請稍後再試。',
     limit:'今天的測試次數已達上限。',
     showing:'已在地圖上顯示',
-    photoPending:'店家照片待圖庫串接',
-    dataNote:'Prototype 資料；正式版將由 Google Drive Google Sheet 單一資料源驅動。',
-    prototype:'Prototype · 店家資料尚在建置'
+    photoPending:'Mock Photo',
+    dataNote:'Sandbox Mock：此資料只供介面演練；之後將改由 Google Drive Google Sheet 單一資料源驅動。',
+    prototype:'Sandbox Mock · $0 API'
   },
   en: {
-    button:'Ask DMYK',
+    button:'Ask DongDong',
     placeholder:'What are you looking for?',
     send:'Send',
-    welcome:'I’m DMYK AI 1.0. Ask about coffee or dessert; tap a recommendation to open the full merchant card.',
+    welcome:'Hi, I’m DongDong. Sandbox mock mode can simulate recommendations and the full merchant-card flow without API calls.',
     quick:['Recommend coffee','Find dessert','What can you do?'],
     map:'View in Map',
     navigate:'Navigate',
@@ -118,13 +194,13 @@ const AI_COPY = {
     back:'← Back to suggestions',
     hours:'Hours',
     phone:'Phone',
-    waiting:'Checking…',
+    waiting:'DongDong is thinking…',
     error:'Unable to answer right now. Please try again.',
     limit:'Today’s prototype request limit has been reached.',
     showing:'Showing on map',
-    photoPending:'Merchant photos pending image-library connection',
-    dataNote:'Prototype data; production will use the Google Drive Google Sheet as the single source of truth.',
-    prototype:'Prototype · merchant data in progress'
+    photoPending:'Mock Photo',
+    dataNote:'Sandbox Mock only. Production data will later come from the Google Drive Google Sheet single source of truth.',
+    prototype:'Sandbox Mock · $0 API'
   }
 };
 
@@ -699,17 +775,66 @@ function focusMapFromAI(lat, lng) {
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
   mapFrame.src = centeredMapUrl(lat, lng);
   closeAiPanel();
-  showLocationStatus(`${getAiCopy().showing} · DMYK AI`, 2200);
+  showLocationStatus(`${getAiCopy().showing} · 咚咚`, 2200);
+}
+
+
+function merchantToCard(merchant) {
+  return {
+    merchant_id:merchant.id,
+    name:currentLang === 'zh' ? merchant.name_zh : merchant.name_en,
+    subtitle:currentLang === 'zh' ? merchant.address_zh : merchant.address_en,
+    category:merchant.category,
+    category_label:currentLang === 'zh' ? merchant.category_zh : merchant.category_en,
+    description:currentLang === 'zh' ? merchant.description_zh : merchant.description_en,
+    hours:currentLang === 'zh' ? merchant.hours_zh : merchant.hours_en,
+    phone:merchant.phone,
+    phone_display:merchant.phone_display,
+    photos:[],
+    lat:merchant.lat,
+    lng:merchant.lng
+  };
+}
+
+function mockAnswer(question) {
+  const q=String(question||'').toLowerCase();
+  let matches=[];
+
+  if (/咖啡|coffee|cafe|安靜|quiet|下午茶/.test(q)) {
+    matches=DEMO_MERCHANTS.filter(m=>m.category==='coffee').slice(0,3);
+  } else if (/甜點|dessert|芋頭|taro|冰|ice/.test(q)) {
+    matches=DEMO_MERCHANTS.filter(m=>m.category==='dessert').slice(0,3);
+  }
+
+  if (/你可以做什麼|what can you do|可以做什麼/.test(q)) {
+    return {
+      answer:currentLang==='zh'
+        ? '我可以先用沙盤資料模擬店家推薦。你可以點選推薦店家，查看完整店家卡，再測試地圖定位、導航、打電話與返回比較。'
+        : 'I can simulate merchant recommendations with sandbox data. Tap a recommendation to test the merchant card, map view, navigation, calling, and returning to compare.',
+      cards:[]
+    };
+  }
+
+  if (!matches.length) {
+    return {
+      answer:currentLang==='zh'
+        ? '目前 Sandbox 先支援咖啡與甜點情境。你可以試著問「推薦咖啡」或「找甜點」。'
+        : 'The current sandbox supports coffee and dessert scenarios. Try “Recommend coffee” or “Find dessert”.',
+      cards:[]
+    };
+  }
+
+  return {
+    answer:currentLang==='zh'
+      ? `我先找到 ${matches.length} 個適合的選擇。點其中一家可以查看完整店家卡。`
+      : `I found ${matches.length} suitable options. Tap one to open its full merchant card.`,
+    cards:matches.map(merchantToCard)
+  };
 }
 
 async function submitAiQuestion(rawQuestion) {
   const question = String(rawQuestion || '').trim();
   if (!question || aiSending) return;
-
-  if (!canUseAiToday()) {
-    addAiMessage('assistant', getAiCopy().limit);
-    return;
-  }
 
   addAiMessage('user', question);
   aiInput.value = '';
@@ -719,36 +844,14 @@ async function submitAiQuestion(rawQuestion) {
   const loadingRow = addAiLoading();
 
   try {
-    incrementAiUsage();
-    const response = await fetch('/api/chat', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        question,
-        lang:currentLang,
-        history:aiHistory.slice(-6)
-      })
-    });
-
-    const data = await response.json().catch(() => ({}));
+    await new Promise(resolve => setTimeout(resolve, 650));
+    const data = mockAnswer(question);
     loadingRow.remove();
 
-    if (!response.ok) throw new Error(data.error || 'AI request failed');
-
-    const answer = typeof data.answer === 'string' && data.answer.trim()
-      ? data.answer.trim()
-      : getAiCopy().error;
-
-    const cards = Array.isArray(data.cards) ? data.cards : [];
-    addAiMessage('assistant', answer, cards);
-    aiHistory.push({role:'user',content:question},{role:'assistant',content:answer});
+    addAiMessage('assistant', data.answer, data.cards || []);
+    aiHistory.push({role:'user',content:question},{role:'assistant',content:data.answer});
     aiHistory = aiHistory.slice(-8);
-
-    if (data.mode === 'ai') {
-      aiModeLabel.textContent = 'AI · GPT-6 Luna';
-    } else {
-      aiModeLabel.textContent = getAiCopy().prototype;
-    }
+    aiModeLabel.textContent = getAiCopy().prototype;
   } catch (_) {
     if (loadingRow.isConnected) loadingRow.remove();
     addAiMessage('assistant', getAiCopy().error);

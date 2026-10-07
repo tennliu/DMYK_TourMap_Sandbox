@@ -609,9 +609,17 @@ function makeMerchantPlaceholder(card, index) {
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
 }
 
+function driveImageUrl(fileId) {
+  return `https://drive.google.com/thumbnail?id=${encodeURIComponent(fileId)}&sz=w1600`;
+}
+
 function getMerchantPhotos(card) {
   const supplied = Array.isArray(card.photos) ? card.photos.filter(Boolean) : [];
   if (supplied.length) return supplied;
+
+  const driveIds = Array.isArray(card.drive_photo_ids) ? card.drive_photo_ids.filter(Boolean) : [];
+  if (driveIds.length) return driveIds.map(driveImageUrl);
+
   return [0,1,2].map(index => makeMerchantPlaceholder(card, index));
 }
 
@@ -689,6 +697,11 @@ function renderMerchantDetail(card) {
   const image = document.createElement('img');
   image.className = 'ai-merchant-photo';
   image.loading = 'eager';
+  image.referrerPolicy = 'no-referrer';
+  image.addEventListener('error', () => {
+    const fallback = makeMerchantPlaceholder(card, merchantPhotoIndex);
+    if (image.src !== fallback) image.src = fallback;
+  });
   hero.appendChild(image);
 
   const prev = document.createElement('button');
@@ -1048,6 +1061,7 @@ function merchantToCard(merchant) {
     photo_folder:merchant.photo_folder || '',
     photo_files:Array.isArray(merchant.photo_files) ? merchant.photo_files : [],
     photo_part:merchant.photo_part || null,
+    drive_photo_ids:Array.isArray(merchant.drive_photo_ids) ? merchant.drive_photo_ids : [],
     ai_tags:Array.isArray(merchant.ai_tags) ? merchant.ai_tags : []
   };
 }

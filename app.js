@@ -697,6 +697,7 @@ function renderMerchantDetail(card) {
   const image = document.createElement('img');
   image.className = 'ai-merchant-photo';
   image.loading = 'eager';
+  image.draggable = false;
   image.referrerPolicy = 'no-referrer';
   image.addEventListener('error', () => {
     const fallback = makeMerchantPlaceholder(card, merchantPhotoIndex);
@@ -725,6 +726,26 @@ function renderMerchantDetail(card) {
     updateMerchantHero(card, photos);
   });
   hero.appendChild(next);
+
+  let photoTouchStartX = null;
+  let photoTouchStartY = null;
+  hero.addEventListener('touchstart', event => {
+    if (!event.touches || event.touches.length !== 1) return;
+    photoTouchStartX = event.touches[0].clientX;
+    photoTouchStartY = event.touches[0].clientY;
+  }, {passive:true});
+  hero.addEventListener('touchend', event => {
+    if (photoTouchStartX === null || !event.changedTouches || !event.changedTouches.length) return;
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - photoTouchStartX;
+    const dy = touch.clientY - photoTouchStartY;
+    photoTouchStartX = null;
+    photoTouchStartY = null;
+
+    if (Math.abs(dx) < 42 || Math.abs(dx) <= Math.abs(dy) * 1.15) return;
+    merchantPhotoIndex += dx < 0 ? 1 : -1;
+    updateMerchantHero(card, photos);
+  }, {passive:true});
 
   const counter = document.createElement('div');
   counter.className = 'ai-photo-index';

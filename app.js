@@ -147,9 +147,12 @@ const merchantFocusBeacon = document.getElementById('merchantFocusBeacon');
 const merchantFocusName = document.getElementById('merchantFocusName');
 const merchantFocusDistance = document.getElementById('merchantFocusDistance');
 const merchantNavigateBtn = document.getElementById('merchantNavigateBtn');
+const merchantNavigateLabel = document.getElementById('merchantNavigateLabel');
+const merchantNavigateDistance = document.getElementById('merchantNavigateDistance');
 const merchantReturnBtn = document.getElementById('merchantReturnBtn');
 
 let currentLang = 'zh';
+let conversationLang = 'zh';
 let locationStatusTimer = null;
 let locationPeekTimer = null;
 let locationPeekCleanupTimer = null;
@@ -165,6 +168,9 @@ let lastUserPosition = null;
 let merchantFocusTimer = null;
 let merchantFocusLoadTimer = null;
 let merchantFocusToken = 0;
+let merchantDistanceText = '';
+let appScale = 1;
+let stableViewportHeight = window.innerHeight;
 
 const LOCATION_ZOOM = 18;
 const LOCATION_HOLD_MS = 2000;
@@ -174,57 +180,124 @@ const MERCHANT_FOCUS_BEACON_MS = 2550;
 
 const AI_COPY = {
   zh: {
-    button:'問咚咚',
-    placeholder:'想找什麼？',
-    send:'送出',
+    button:'問咚咚', placeholder:'想找什麼？', send:'送出',
     welcome:'嗨，我是咚咚。現在是 Sandbox 沙盤模式，可以直接推演咖啡、甜點推薦與完整店家卡流程。',
     quick:['推薦咖啡','找甜點','你可以做什麼？'],
-    map:'在地圖上查看',
-    navigate:'導航',
-    call:'打電話',
-    back:'← 返回推薦',
-    hours:'營業時間',
-    phone:'電話',
-    waiting:'咚咚正在想…',
-    error:'目前無法取得回覆，請稍後再試。',
-    limit:'今天的測試次數已達上限。',
-    showing:'已在地圖上顯示',
-    photoPending:'Mock Photo',
+    map:'在地圖上查看', navigate:'導航', call:'打電話', back:'← 返回推薦',
+    hours:'營業時間', phone:'電話', waiting:'咚咚正在想…',
+    error:'目前無法取得回覆，請稍後再試。', limit:'今天的測試次數已達上限。',
+    showing:'已在地圖上顯示', photoPending:'Mock Photo',
     dataNote:'Sandbox Mock：此資料只供介面演練；之後將改由 Google Drive Google Sheet 單一資料源驅動。',
-    prototype:'Sandbox Mock · $0 API',
-    navigateShop:'導航至店家',
-    returnDongDong:'回到咚咚',
-    gettingDistance:'正在取得你的位置…',
-    distanceUnavailable:'距離未取得'
+    prototype:'Sandbox Mock · $0 API', navigateShop:'導航至店家', returnDongDong:'回到咚咚'
   },
   en: {
-    button:'Ask DongDong',
-    placeholder:'What are you looking for?',
-    send:'Send',
+    button:'Ask DongDong', placeholder:'What are you looking for?', send:'Send',
     welcome:'Hi, I’m DongDong. Sandbox mock mode can simulate recommendations and the full merchant-card flow without API calls.',
     quick:['Recommend coffee','Find dessert','What can you do?'],
-    map:'View in Map',
-    navigate:'Navigate',
-    call:'Call',
-    back:'← Back to suggestions',
-    hours:'Hours',
-    phone:'Phone',
-    waiting:'DongDong is thinking…',
-    error:'Unable to answer right now. Please try again.',
-    limit:'Today’s prototype request limit has been reached.',
-    showing:'Showing on map',
-    photoPending:'Mock Photo',
+    map:'View in Map', navigate:'Navigate', call:'Call', back:'← Back to suggestions',
+    hours:'Hours', phone:'Phone', waiting:'DongDong is thinking…',
+    error:'Unable to answer right now. Please try again.', limit:'Today’s prototype request limit has been reached.',
+    showing:'Showing on map', photoPending:'Mock Photo',
     dataNote:'Sandbox Mock only. Production data will later come from the Google Drive Google Sheet single source of truth.',
-    prototype:'Sandbox Mock · $0 API',
-    navigateShop:'Navigate to shop',
-    returnDongDong:'Return to Dong-Dong',
-    gettingDistance:'Getting your location…',
-    distanceUnavailable:'Distance unavailable'
+    prototype:'Sandbox Mock · $0 API', navigateShop:'Navigate to shop', returnDongDong:'Return to Dong-Dong'
+  },
+  ja: {
+    button:'咚咚に聞く', placeholder:'何を探していますか？', send:'送信',
+    welcome:'こんにちは、咚咚です。現在はSandboxの模擬モードで、カフェやスイーツのおすすめと店舗カードの流れを試せます。',
+    quick:['カフェをおすすめ','スイーツを探す','何ができる？'],
+    map:'地図で見る', navigate:'ナビ', call:'電話', back:'← おすすめに戻る',
+    hours:'営業時間', phone:'電話', waiting:'咚咚が考えています…',
+    error:'現在回答を取得できません。後でもう一度お試しください。', limit:'本日のテスト回数の上限に達しました。',
+    showing:'地図に表示中', photoPending:'Mock Photo',
+    dataNote:'Sandbox Mockのデータです。正式版ではGoogle DriveのGoogle Sheetを単一データソースとして使用します。',
+    prototype:'Sandbox Mock · $0 API', navigateShop:'お店までナビ', returnDongDong:'咚咚に戻る'
+  },
+  ko: {
+    button:'咚咚에게 묻기', placeholder:'무엇을 찾고 있나요?', send:'보내기',
+    welcome:'안녕하세요, 咚咚입니다. 현재 Sandbox 모의 모드에서 카페·디저트 추천과 매장 카드 흐름을 테스트할 수 있습니다.',
+    quick:['카페 추천','디저트 찾기','무엇을 할 수 있어?'],
+    map:'지도에서 보기', navigate:'길찾기', call:'전화', back:'← 추천으로 돌아가기',
+    hours:'영업시간', phone:'전화', waiting:'咚咚이 생각 중…',
+    error:'현재 답변을 가져올 수 없습니다. 잠시 후 다시 시도해 주세요.', limit:'오늘의 테스트 횟수 한도에 도달했습니다.',
+    showing:'지도에 표시 중', photoPending:'Mock Photo',
+    dataNote:'Sandbox Mock 데이터입니다. 정식 버전은 Google Drive의 Google Sheet를 단일 데이터 소스로 사용합니다.',
+    prototype:'Sandbox Mock · $0 API', navigateShop:'매장으로 길찾기', returnDongDong:'咚咚으로 돌아가기'
+  },
+  th: {
+    button:'ถาม咚咚', placeholder:'กำลังมองหาอะไร?', send:'ส่ง',
+    welcome:'สวัสดี ฉันคือ咚咚 ขณะนี้เป็นโหมดจำลอง Sandbox สำหรับทดลองการแนะนำคาเฟ่ ของหวาน และการ์ดร้านค้า',
+    quick:['แนะนำคาเฟ่','หาร้านของหวาน','ทำอะไรได้บ้าง?'],
+    map:'ดูบนแผนที่', navigate:'นำทาง', call:'โทร', back:'← กลับไปที่คำแนะนำ',
+    hours:'เวลาเปิด', phone:'โทรศัพท์', waiting:'咚咚กำลังคิด…',
+    error:'ขณะนี้ไม่สามารถรับคำตอบได้ กรุณาลองใหม่ภายหลัง', limit:'ถึงขีดจำกัดการทดสอบของวันนี้แล้ว',
+    showing:'แสดงบนแผนที่แล้ว', photoPending:'Mock Photo',
+    dataNote:'ข้อมูล Sandbox Mock เท่านั้น เวอร์ชันจริงจะใช้ Google Sheet บน Google Drive เป็นแหล่งข้อมูลหลักเดียว',
+    prototype:'Sandbox Mock · $0 API', navigateShop:'นำทางไปร้าน', returnDongDong:'กลับไปหา咚咚'
+  },
+  vi: {
+    button:'Hỏi 咚咚', placeholder:'Bạn đang tìm gì?', send:'Gửi',
+    welcome:'Xin chào, tôi là 咚咚. Hiện đây là chế độ mô phỏng Sandbox để thử luồng gợi ý quán cà phê, món ngọt và thẻ cửa hàng.',
+    quick:['Gợi ý quán cà phê','Tìm món ngọt','Bạn làm được gì?'],
+    map:'Xem trên bản đồ', navigate:'Chỉ đường', call:'Gọi', back:'← Quay lại gợi ý',
+    hours:'Giờ mở cửa', phone:'Điện thoại', waiting:'咚咚 đang suy nghĩ…',
+    error:'Hiện chưa thể lấy câu trả lời. Vui lòng thử lại sau.', limit:'Đã đạt giới hạn thử nghiệm hôm nay.',
+    showing:'Đang hiển thị trên bản đồ', photoPending:'Mock Photo',
+    dataNote:'Dữ liệu Sandbox Mock. Bản chính thức sẽ dùng Google Sheet trên Google Drive làm nguồn dữ liệu duy nhất.',
+    prototype:'Sandbox Mock · $0 API', navigateShop:'Chỉ đường đến cửa hàng', returnDongDong:'Quay lại 咚咚'
+  },
+  id: {
+    button:'Tanya 咚咚', placeholder:'Apa yang Anda cari?', send:'Kirim',
+    welcome:'Halo, saya 咚咚. Saat ini mode simulasi Sandbox dapat digunakan untuk mencoba rekomendasi kafe, pencuci mulut, dan alur kartu toko.',
+    quick:['Rekomendasikan kafe','Cari pencuci mulut','Apa yang bisa kamu lakukan?'],
+    map:'Lihat di peta', navigate:'Navigasi', call:'Telepon', back:'← Kembali ke rekomendasi',
+    hours:'Jam buka', phone:'Telepon', waiting:'咚咚 sedang berpikir…',
+    error:'Jawaban belum dapat diperoleh. Silakan coba lagi nanti.', limit:'Batas pengujian hari ini telah tercapai.',
+    showing:'Ditampilkan di peta', photoPending:'Mock Photo',
+    dataNote:'Data Sandbox Mock. Versi produksi akan memakai Google Sheet di Google Drive sebagai satu-satunya sumber data.',
+    prototype:'Sandbox Mock · $0 API', navigateShop:'Navigasi ke toko', returnDongDong:'Kembali ke 咚咚'
+  }
+};
+
+const MOCK_COPY = {
+  zh:{
+    capability:'我可以先用沙盤資料模擬店家推薦。你可以點選推薦店家，查看完整店家卡，再測試地圖定位、導航、打電話與返回比較。',
+    unsupported:'目前 Sandbox 先支援咖啡與甜點情境。你可以試著問「推薦咖啡」或「找甜點」。',
+    found:count=>`我先找到 ${count} 個適合的選擇。點其中一家可以查看完整店家卡。`
+  },
+  en:{
+    capability:'I can simulate merchant recommendations with sandbox data. Tap a recommendation to test the merchant card, map view, navigation, calling, and returning to compare.',
+    unsupported:'The current sandbox supports coffee and dessert scenarios. Try “Recommend coffee” or “Find dessert”.',
+    found:count=>`I found ${count} suitable options. Tap one to open its full merchant card.`
+  },
+  ja:{
+    capability:'Sandboxデータを使って店舗のおすすめを模擬できます。おすすめをタップすると店舗カードを開き、地図表示、ナビ、電話、比較への戻りを試せます。',
+    unsupported:'現在のSandboxはカフェとスイーツのシナリオに対応しています。「カフェをおすすめ」または「スイーツを探す」と聞いてみてください。',
+    found:count=>`${count}件の候補が見つかりました。店舗をタップすると詳しい店舗カードを確認できます。`
+  },
+  ko:{
+    capability:'Sandbox 데이터로 매장 추천을 모의할 수 있습니다. 추천 매장을 누르면 매장 카드, 지도 보기, 길찾기, 전화, 비교 화면 복귀를 테스트할 수 있습니다.',
+    unsupported:'현재 Sandbox는 카페와 디저트 시나리오를 지원합니다. “카페 추천” 또는 “디저트 찾기”를 시도해 보세요.',
+    found:count=>`적합한 선택지 ${count}곳을 찾았습니다. 매장을 누르면 전체 매장 카드를 볼 수 있습니다.`
+  },
+  th:{
+    capability:'ฉันสามารถจำลองการแนะนำร้านด้วยข้อมูล Sandbox ได้ แตะร้านที่แนะนำเพื่อทดลองการ์ดร้านค้า การดูแผนที่ การนำทาง การโทร และการกลับมาเปรียบเทียบ',
+    unsupported:'ขณะนี้ Sandbox รองรับสถานการณ์คาเฟ่และของหวาน ลองถามว่า “แนะนำคาเฟ่” หรือ “หาร้านของหวาน”',
+    found:count=>`พบตัวเลือกที่เหมาะสม ${count} แห่ง แตะร้านเพื่อดูการ์ดร้านค้าแบบเต็ม`
+  },
+  vi:{
+    capability:'Tôi có thể mô phỏng gợi ý cửa hàng bằng dữ liệu Sandbox. Hãy chạm vào một gợi ý để thử thẻ cửa hàng, xem bản đồ, chỉ đường, gọi điện và quay lại so sánh.',
+    unsupported:'Sandbox hiện hỗ trợ tình huống quán cà phê và món ngọt. Hãy thử hỏi “Gợi ý quán cà phê” hoặc “Tìm món ngọt”.',
+    found:count=>`Tôi tìm thấy ${count} lựa chọn phù hợp. Chạm vào một cửa hàng để xem thẻ đầy đủ.`
+  },
+  id:{
+    capability:'Saya dapat menyimulasikan rekomendasi toko dengan data Sandbox. Ketuk rekomendasi untuk mencoba kartu toko, tampilan peta, navigasi, telepon, dan kembali membandingkan.',
+    unsupported:'Sandbox saat ini mendukung skenario kafe dan pencuci mulut. Coba tanyakan “Rekomendasikan kafe” atau “Cari pencuci mulut”.',
+    found:count=>`Saya menemukan ${count} pilihan yang sesuai. Ketuk salah satu toko untuk membuka kartu lengkap.`
   }
 };
 
 function getAiCopy() {
-  return AI_COPY[currentLang] || AI_COPY.en;
+  return AI_COPY[conversationLang] || AI_COPY.en;
 }
 
 function applyAiCopy() {
@@ -233,8 +306,9 @@ function applyAiCopy() {
   aiInput.placeholder = t.placeholder;
   aiSendBtn.textContent = t.send;
   aiModeLabel.textContent = t.prototype;
-  merchantNavigateBtn.textContent = t.navigateShop;
+  merchantNavigateLabel.textContent = t.navigateShop;
   merchantReturnBtn.textContent = t.returnDongDong;
+  updateMerchantNavigateAction();
   renderAiQuickPrompts();
   if (selectedMerchant) renderMerchantDetail(selectedMerchant);
 }
@@ -251,6 +325,7 @@ function openMap(lang) {
   exitMerchantFocus();
   cancelLocationPeek(true);
   currentLang = lang;
+  conversationLang = lang;
   applyOverlayCopy(lang);
   closeAiPanel();
   resetAiConversation();
@@ -258,6 +333,9 @@ function openMap(lang) {
   mapFrame.src = MAPS[lang];
   languageScreen.classList.add('is-hidden');
   mapScreen.classList.remove('is-hidden');
+  document.body.classList.add('map-active');
+  stableViewportHeight = window.innerHeight;
+  syncAppScale();
   closeOverlay();
   window.scrollTo(0,0);
 }
@@ -269,6 +347,8 @@ function showLanguagePage() {
   closeOverlay();
   mapFrame.src = '';
   mapScreen.classList.add('is-hidden');
+  document.body.classList.remove('map-active');
+  phoneShell.style.setProperty('--keyboard-inset','0px');
   languageScreen.classList.remove('is-hidden');
   window.scrollTo(0,0);
 }
@@ -556,19 +636,21 @@ function backToSuggestions() {
 }
 
 function navigateToMerchant(card) {
+  if (!card) return;
   const url = new URL('https://www.google.com/maps/dir/');
   url.searchParams.set('api','1');
 
-  if (Number.isFinite(card.lat) && Number.isFinite(card.lng)) {
+  if (card.google_place_id && card.name) {
+    url.searchParams.set('destination', card.name);
+    url.searchParams.set('destination_place_id', card.google_place_id);
+  } else if (card.name && card.subtitle) {
+    url.searchParams.set('destination', `${card.name}, ${card.subtitle}`);
+  } else if (card.name) {
+    url.searchParams.set('destination', card.name);
+  } else if (Number.isFinite(card.lat) && Number.isFinite(card.lng)) {
     url.searchParams.set('destination', `${card.lat},${card.lng}`);
-  } else if (card.subtitle) {
-    url.searchParams.set('destination', card.subtitle);
   } else {
     return;
-  }
-
-  if (card.google_place_id) {
-    url.searchParams.set('destination_place_id', card.google_place_id);
   }
 
   window.open(url.toString(), '_blank', 'noopener');
@@ -809,41 +891,49 @@ function distanceMeters(lat1, lng1, lat2, lng2) {
 
 function formatMerchantDistance(meters) {
   if (!Number.isFinite(meters)) return '';
-  if (meters < 1000) {
-    const rounded = meters < 100 ? Math.round(meters / 5) * 5 : Math.round(meters / 10) * 10;
-    return currentLang === 'zh' ? `約 ${rounded} m` : `About ${rounded} m`;
-  }
-  const km = (meters / 1000).toFixed(meters < 10000 ? 1 : 0);
-  return currentLang === 'zh' ? `約 ${km} km` : `About ${km} km`;
+  const value = meters < 1000
+    ? (meters < 100 ? Math.round(meters / 5) * 5 : Math.round(meters / 10) * 10)
+    : (meters / 1000).toFixed(meters < 10000 ? 1 : 0);
+  const unit = meters < 1000 ? 'm' : 'km';
+  const prefix = {
+    zh:'約 ', en:'About ', ja:'約 ', ko:'약 ', th:'ประมาณ ', vi:'Khoảng ', id:'Sekitar '
+  }[conversationLang] || 'About ';
+  return `${prefix}${value} ${unit}`;
+}
+
+function updateMerchantNavigateAction() {
+  if (!merchantNavigateLabel || !merchantNavigateDistance) return;
+  merchantNavigateLabel.textContent = getAiCopy().navigateShop;
+  merchantNavigateDistance.textContent = merchantDistanceText || '';
+  merchantNavigateDistance.classList.toggle('is-visible', Boolean(merchantDistanceText));
 }
 
 function updateMerchantFocusDistance(card, position) {
   if (!card || !position || !Number.isFinite(card.lat) || !Number.isFinite(card.lng)) return;
   const meters = distanceMeters(position.lat, position.lng, card.lat, card.lng);
-  merchantFocusDistance.textContent = formatMerchantDistance(meters);
+  merchantDistanceText = formatMerchantDistance(meters);
+  updateMerchantNavigateAction();
 }
 
 function requestMerchantFocusGps(card, token) {
-  const t = getAiCopy();
-  merchantFocusDistance.textContent = t.gettingDistance;
+  merchantDistanceText = '';
+  merchantFocusDistance.textContent = '';
+  updateMerchantNavigateAction();
 
-  if (!navigator.geolocation) {
-    merchantFocusDistance.textContent = t.distanceUnavailable;
-    return;
-  }
+  if (!navigator.geolocation) return;
 
   navigator.geolocation.getCurrentPosition(
     position => {
       const {latitude: lat, longitude: lng} = position.coords;
-      if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-        if (token === merchantFocusToken) merchantFocusDistance.textContent = t.distanceUnavailable;
-        return;
-      }
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
       lastUserPosition = {lat, lng};
       if (token === merchantFocusToken) updateMerchantFocusDistance(card, lastUserPosition);
     },
     () => {
-      if (token === merchantFocusToken) merchantFocusDistance.textContent = t.distanceUnavailable;
+      if (token === merchantFocusToken) {
+        merchantDistanceText = '';
+        updateMerchantNavigateAction();
+      }
     },
     {enableHighAccuracy:true, maximumAge:30000, timeout:10000}
   );
@@ -875,8 +965,9 @@ function enterMerchantFocus(card) {
   merchantFocusLayer.setAttribute('aria-hidden','false');
   merchantFocusBeacon.classList.add('is-hidden');
   merchantFocusName.textContent = card.name || '';
-  merchantFocusDistance.textContent = getAiCopy().gettingDistance;
-  merchantNavigateBtn.textContent = getAiCopy().navigateShop;
+  merchantFocusDistance.textContent = '';
+  merchantDistanceText = '';
+  updateMerchantNavigateAction();
   merchantReturnBtn.textContent = getAiCopy().returnDongDong;
 
   requestMerchantFocusGps(card, token);
@@ -925,52 +1016,46 @@ function returnToDongDong() {
 function merchantToCard(merchant) {
   return {
     merchant_id:merchant.id,
-    name:currentLang === 'zh' ? merchant.name_zh : merchant.name_en,
-    subtitle:currentLang === 'zh' ? merchant.address_zh : merchant.address_en,
+    name:conversationLang === 'zh' ? merchant.name_zh : merchant.name_en,
+    subtitle:conversationLang === 'zh' ? merchant.address_zh : merchant.address_en,
     category:merchant.category,
-    category_label:currentLang === 'zh' ? merchant.category_zh : merchant.category_en,
-    description:currentLang === 'zh' ? merchant.description_zh : merchant.description_en,
-    hours:currentLang === 'zh' ? merchant.hours_zh : merchant.hours_en,
+    category_label:conversationLang === 'zh' ? merchant.category_zh : merchant.category_en,
+    description:conversationLang === 'zh' ? merchant.description_zh : merchant.description_en,
+    hours:conversationLang === 'zh' ? merchant.hours_zh : merchant.hours_en,
     phone:merchant.phone,
     phone_display:merchant.phone_display,
     photos:[],
+    google_place_id:merchant.google_place_id || '',
     lat:merchant.lat,
     lng:merchant.lng
   };
 }
 
 function mockAnswer(question) {
-  const q=String(question||'').toLowerCase();
-  let matches=[];
+  const q = String(question || '').toLowerCase();
+  const copy = MOCK_COPY[conversationLang] || MOCK_COPY.en;
+  let matches = [];
 
-  if (/咖啡|coffee|cafe|安靜|quiet|下午茶/.test(q)) {
-    matches=DEMO_MERCHANTS.filter(m=>m.category==='coffee').slice(0,3);
-  } else if (/甜點|dessert|芋頭|taro|冰|ice/.test(q)) {
-    matches=DEMO_MERCHANTS.filter(m=>m.category==='dessert').slice(0,3);
+  const coffeePattern = /咖啡|coffee|cafe|café|安靜|quiet|下午茶|コーヒー|カフェ|카페|커피|กาแฟ|cà phê|cafe|kopi/;
+  const dessertPattern = /甜點|dessert|芋頭|taro|冰|ice|スイーツ|デザート|디저트|ของหวาน|ขนม|món ngọt|tráng miệng|pencuci mulut|dessert/;
+  const capabilityPattern = /你可以做什麼|what can you do|可以做什麼|何ができる|무엇을 할 수|ทำอะไรได้บ้าง|bạn làm được gì|apa yang bisa kamu lakukan/;
+
+  if (coffeePattern.test(q)) {
+    matches = DEMO_MERCHANTS.filter(m => m.category === 'coffee').slice(0,3);
+  } else if (dessertPattern.test(q)) {
+    matches = DEMO_MERCHANTS.filter(m => m.category === 'dessert').slice(0,3);
   }
 
-  if (/你可以做什麼|what can you do|可以做什麼/.test(q)) {
-    return {
-      answer:currentLang==='zh'
-        ? '我可以先用沙盤資料模擬店家推薦。你可以點選推薦店家，查看完整店家卡，再測試地圖定位、導航、打電話與返回比較。'
-        : 'I can simulate merchant recommendations with sandbox data. Tap a recommendation to test the merchant card, map view, navigation, calling, and returning to compare.',
-      cards:[]
-    };
+  if (capabilityPattern.test(q)) {
+    return {answer:copy.capability, cards:[]};
   }
 
   if (!matches.length) {
-    return {
-      answer:currentLang==='zh'
-        ? '目前 Sandbox 先支援咖啡與甜點情境。你可以試著問「推薦咖啡」或「找甜點」。'
-        : 'The current sandbox supports coffee and dessert scenarios. Try “Recommend coffee” or “Find dessert”.',
-      cards:[]
-    };
+    return {answer:copy.unsupported, cards:[]};
   }
 
   return {
-    answer:currentLang==='zh'
-      ? `我先找到 ${matches.length} 個適合的選擇。點其中一家可以查看完整店家卡。`
-      : `I found ${matches.length} suitable options. Tap one to open its full merchant card.`,
+    answer:copy.found(matches.length),
     cards:matches.map(merchantToCard)
   };
 }
@@ -1012,23 +1097,51 @@ const appStage = document.querySelector('.app-stage');
 const phoneShell = document.querySelector('.phone-shell');
 
 function syncAppScale() {
-  const viewport = window.visualViewport;
-  const vw = viewport ? viewport.width : window.innerWidth;
-  const vh = viewport ? viewport.height : window.innerHeight;
-  const scale = vw <= PHONE_BREAKPOINT ? vw / MASTER_WIDTH : 1;
+  const vw = window.innerWidth;
+  const inputFocused = document.activeElement === aiInput;
+  if (!inputFocused) stableViewportHeight = window.innerHeight;
+  const vh = inputFocused ? stableViewportHeight : window.innerHeight;
+  appScale = vw <= PHONE_BREAKPOINT ? vw / MASTER_WIDTH : 1;
 
-  appStage.style.width = `${MASTER_WIDTH * scale}px`;
+  appStage.style.width = `${MASTER_WIDTH * appScale}px`;
   appStage.style.height = `${vh}px`;
   phoneShell.style.width = `${MASTER_WIDTH}px`;
-  phoneShell.style.height = `${vh / scale}px`;
-  phoneShell.style.transform = `scale(${scale})`;
+  phoneShell.style.height = `${vh / appScale}px`;
+  phoneShell.style.transform = `scale(${appScale})`;
+}
+
+function syncKeyboardViewport() {
+  const viewport = window.visualViewport;
+  const inputFocused = document.activeElement === aiInput;
+  if (!viewport || !inputFocused || !document.body.classList.contains('map-active')) {
+    phoneShell.style.setProperty('--keyboard-inset','0px');
+    return;
+  }
+
+  const layoutHeight = stableViewportHeight || window.innerHeight;
+  const covered = Math.max(0, layoutHeight - viewport.height - viewport.offsetTop);
+  const keyboardInset = covered > 80 ? covered / appScale : 0;
+  phoneShell.style.setProperty('--keyboard-inset', `${keyboardInset}px`);
 }
 
 syncAppScale();
-window.addEventListener('resize', syncAppScale, {passive:true});
+window.addEventListener('resize', () => {
+  syncAppScale();
+  syncKeyboardViewport();
+}, {passive:true});
 if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', syncAppScale, {passive:true});
+  window.visualViewport.addEventListener('resize', syncKeyboardViewport, {passive:true});
+  window.visualViewport.addEventListener('scroll', syncKeyboardViewport, {passive:true});
 }
+
+aiInput.addEventListener('focus', () => {
+  stableViewportHeight = Math.max(stableViewportHeight || 0, window.innerHeight);
+  requestAnimationFrame(syncKeyboardViewport);
+});
+aiInput.addEventListener('blur', () => {
+  phoneShell.style.setProperty('--keyboard-inset','0px');
+  setTimeout(syncAppScale, 80);
+});
 
 document.querySelectorAll('.lang-btn').forEach(btn => {
   btn.addEventListener('click', () => openMap(btn.dataset.lang));

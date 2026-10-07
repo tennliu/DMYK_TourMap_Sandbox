@@ -142,6 +142,12 @@ const aiForm = document.getElementById('aiForm');
 const aiInput = document.getElementById('aiInput');
 const aiSendBtn = document.getElementById('aiSendBtn');
 const aiModeLabel = document.getElementById('aiModeLabel');
+const merchantFocusLayer = document.getElementById('merchantFocusLayer');
+const merchantFocusBeacon = document.getElementById('merchantFocusBeacon');
+const merchantFocusName = document.getElementById('merchantFocusName');
+const merchantFocusDistance = document.getElementById('merchantFocusDistance');
+const merchantNavigateBtn = document.getElementById('merchantNavigateBtn');
+const merchantReturnBtn = document.getElementById('merchantReturnBtn');
 
 let currentLang = 'zh';
 let locationStatusTimer = null;
@@ -155,11 +161,16 @@ let aiSending = false;
 let aiInitialized = false;
 let selectedMerchant = null;
 let merchantPhotoIndex = 0;
+let lastUserPosition = null;
+let merchantFocusTimer = null;
+let merchantFocusLoadTimer = null;
+let merchantFocusToken = 0;
 
 const LOCATION_ZOOM = 18;
 const LOCATION_HOLD_MS = 2000;
 const LOCATION_RETURN_MS = 720;
 const AI_CLIENT_DAILY_LIMIT = 20;
+const MERCHANT_FOCUS_BEACON_MS = 2550;
 
 const AI_COPY = {
   zh: {
@@ -180,7 +191,11 @@ const AI_COPY = {
     showing:'已在地圖上顯示',
     photoPending:'Mock Photo',
     dataNote:'Sandbox Mock：此資料只供介面演練；之後將改由 Google Drive Google Sheet 單一資料源驅動。',
-    prototype:'Sandbox Mock · $0 API'
+    prototype:'Sandbox Mock · $0 API',
+    navigateShop:'導航至店家',
+    returnDongDong:'回到咚咚',
+    gettingDistance:'正在取得你的位置…',
+    distanceUnavailable:'距離未取得'
   },
   en: {
     button:'Ask DongDong',
@@ -200,7 +215,11 @@ const AI_COPY = {
     showing:'Showing on map',
     photoPending:'Mock Photo',
     dataNote:'Sandbox Mock only. Production data will later come from the Google Drive Google Sheet single source of truth.',
-    prototype:'Sandbox Mock · $0 API'
+    prototype:'Sandbox Mock · $0 API',
+    navigateShop:'Navigate to shop',
+    returnDongDong:'Return to Dong-Dong',
+    gettingDistance:'Getting your location…',
+    distanceUnavailable:'Distance unavailable'
   }
 };
 
@@ -214,6 +233,8 @@ function applyAiCopy() {
   aiInput.placeholder = t.placeholder;
   aiSendBtn.textContent = t.send;
   aiModeLabel.textContent = t.prototype;
+  merchantNavigateBtn.textContent = t.navigateShop;
+  merchantReturnBtn.textContent = t.returnDongDong;
   renderAiQuickPrompts();
   if (selectedMerchant) renderMerchantDetail(selectedMerchant);
 }
@@ -227,6 +248,7 @@ function applyOverlayCopy(lang) {
 }
 
 function openMap(lang) {
+  exitMerchantFocus();
   cancelLocationPeek(true);
   currentLang = lang;
   applyOverlayCopy(lang);
@@ -241,6 +263,7 @@ function openMap(lang) {
 }
 
 function showLanguagePage() {
+  exitMerchantFocus();
   cancelLocationPeek(true);
   closeAiPanel();
   closeOverlay();
@@ -361,6 +384,7 @@ function revealLocationPeek(position, token) {
 
 function beginLocationPeek(position) {
   const {latitude: lat, longitude: lng} = position.coords;
+  lastUserPosition = {lat, lng};
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
     setLocateButton('idle');
     showLocationStatus('無法取得位置 / Unable to locate', 3000);
@@ -662,7 +686,7 @@ function renderMerchantDetail(card) {
   viewMap.className = 'ai-merchant-action primary';
   viewMap.textContent = t.map;
   viewMap.disabled = !(Number.isFinite(card.lat) && Number.isFinite(card.lng));
-  viewMap.addEventListener('click', () => focusMapFromAI(card.lat, card.lng));
+  viewMap.addEventListener('click', () => focusMapFromAI(card));
   actions.appendChild(viewMap);
 
   const navigate = document.createElement('button');
@@ -771,13 +795,132 @@ function incrementAiUsage() {
   } catch (_) {}
 }
 
-function focusMapFromAI(lat, lng) {
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-  mapFrame.src = centeredMapUrl(lat, lng);
-  closeAiPanel();
-  showLocationStatus(`${getAiCopy().showing} · 咚咚`, 2200);
+function distanceMeters(lat1, lng1, lat2, lng2) {
+  const toRad = value => value * Math.PI / 180;
+  const earthRadius = 6371000;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function formatMerchantDistance(meters) {
+  if (!Number.isFinite(meters)) return '';
+  if (meters < 1000) {
+    const rounded = meters < 100 ? Math.round(meters / 5) * 5 : Math.round(meters / 10) * 10;
+    return currentLang === 'zh' ? `約 ${rounded} m` : `About ${rounded} m`;
+  }
+  const km = (meters / 1000).toFixed(meters < 10000 ? 1 : 0);
+  return currentLang === 'zh' ? `約 ${km} km` : `About ${km} km`;
+}
+
+function updateMerchantFocusDistance(card, position) {
+  if (!card || !position || !Number.isFinite(card.lat) || !Number.isFinite(card.lng)) return;
+  const meters = distanceMeters(position.lat, position.lng, card.lat, card.lng);
+  merchantFocusDistance.textContent = formatMerchantDistance(meters);
+}
+
+function requestMerchantFocusGps(card, token) {
+  const t = getAiCopy();
+  merchantFocusDistance.textContent = t.gettingDistance;
+
+  if (!navigator.geolocation) {
+    merchantFocusDistance.textContent = t.distanceUnavailable;
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      const {latitude: lat, longitude: lng} = position.coords;
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        if (token === merchantFocusToken) merchantFocusDistance.textContent = t.distanceUnavailable;
+        return;
+      }
+      lastUserPosition = {lat, lng};
+      if (token === merchantFocusToken) updateMerchantFocusDistance(card, lastUserPosition);
+    },
+    () => {
+      if (token === merchantFocusToken) merchantFocusDistance.textContent = t.distanceUnavailable;
+    },
+    {enableHighAccuracy:true, maximumAge:30000, timeout:10000}
+  );
+}
+
+function revealMerchantFocusBeacon(token) {
+  if (token !== merchantFocusToken || !selectedMerchant) return;
+  clearTimeout(merchantFocusTimer);
+  merchantFocusBeacon.classList.remove('is-hidden');
+  // Restart the finite pulse animation every time a merchant is focused.
+  merchantFocusBeacon.querySelectorAll('.merchant-focus-ring').forEach(ring => {
+    ring.style.animation = 'none';
+    void ring.offsetWidth;
+    ring.style.animation = '';
+  });
+  merchantFocusTimer = setTimeout(() => {
+    if (token !== merchantFocusToken) return;
+    merchantFocusBeacon.classList.add('is-hidden');
+  }, MERCHANT_FOCUS_BEACON_MS);
+}
+
+function enterMerchantFocus(card) {
+  clearTimeout(merchantFocusTimer);
+  clearTimeout(merchantFocusLoadTimer);
+  const token = ++merchantFocusToken;
+
+  mapScreen.classList.add('is-merchant-focus');
+  merchantFocusLayer.classList.add('is-active');
+  merchantFocusLayer.setAttribute('aria-hidden','false');
+  merchantFocusBeacon.classList.add('is-hidden');
+  merchantFocusName.textContent = card.name || '';
+  merchantFocusDistance.textContent = getAiCopy().gettingDistance;
+  merchantNavigateBtn.textContent = getAiCopy().navigateShop;
+  merchantReturnBtn.textContent = getAiCopy().returnDongDong;
+
+  requestMerchantFocusGps(card, token);
+
+  let revealed = false;
+  const revealOnce = () => {
+    if (revealed || token !== merchantFocusToken) return;
+    revealed = true;
+    revealMerchantFocusBeacon(token);
+  };
+
+  mapFrame.addEventListener('load', revealOnce, {once:true});
+  merchantFocusLoadTimer = setTimeout(revealOnce, 1200);
+}
+
+function exitMerchantFocus() {
+  merchantFocusToken += 1;
+  clearTimeout(merchantFocusTimer);
+  clearTimeout(merchantFocusLoadTimer);
+  merchantFocusTimer = null;
+  merchantFocusLoadTimer = null;
+  mapScreen.classList.remove('is-merchant-focus');
+  merchantFocusLayer.classList.remove('is-active');
+  merchantFocusLayer.setAttribute('aria-hidden','true');
+  merchantFocusBeacon.classList.add('is-hidden');
+}
+
+function focusMapFromAI(card) {
+  if (!card || !Number.isFinite(card.lat) || !Number.isFinite(card.lng)) return;
+  selectedMerchant = card;
+  mapFrame.src = centeredMapUrl(card.lat, card.lng);
+  closeAiPanel();
+  enterMerchantFocus(card);
+}
+
+function returnToDongDong() {
+  if (!selectedMerchant) {
+    exitMerchantFocus();
+    openAiPanel();
+    return;
+  }
+  exitMerchantFocus();
+  openAiPanel();
+}
 
 function merchantToCard(merchant) {
   return {
@@ -897,6 +1040,10 @@ locateBtn.addEventListener('click', startLocationPeek);
 aiBtn.addEventListener('click', openAiPanel);
 aiCloseBtn.addEventListener('click', closeAiPanel);
 aiBackdrop.addEventListener('click', closeAiPanel);
+merchantNavigateBtn.addEventListener('click', () => {
+  if (selectedMerchant) navigateToMerchant(selectedMerchant);
+});
+merchantReturnBtn.addEventListener('click', returnToDongDong);
 aiForm.addEventListener('submit', e => {
   e.preventDefault();
   submitAiQuestion(aiInput.value);

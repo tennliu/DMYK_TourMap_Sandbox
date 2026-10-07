@@ -188,7 +188,7 @@ const AI_COPY = {
   zh: {
     button:'問咚咚', placeholder:'想找什麼？', send:'送出',
     welcome:'嗨，我是咚咚。現在是 Sandbox 沙盤模式，可以直接推演咖啡、甜點推薦與完整店家卡流程。',
-    quick:['推薦咖啡','找甜點','你可以做什麼？'],
+    quick:['推薦咖啡','買伴手禮','找眼鏡'],
     map:'在地圖上查看', navigate:'導航', call:'打電話', back:'← 返回推薦',
     hours:'營業時間', phone:'電話', waiting:'咚咚正在想…',
     error:'目前無法取得回覆，請稍後再試。', limit:'今天的測試次數已達上限。',
@@ -199,7 +199,7 @@ const AI_COPY = {
   en: {
     button:'Ask DongDong', placeholder:'What are you looking for?', send:'Send',
     welcome:'Hi, I’m DongDong. Sandbox mock mode can simulate recommendations and the full merchant-card flow without API calls.',
-    quick:['Recommend coffee','Find dessert','What can you do?'],
+    quick:['Recommend coffee','Find a gift','Find glasses'],
     map:'View in Map', navigate:'Navigate', call:'Call', back:'← Back to suggestions',
     hours:'Hours', phone:'Phone', waiting:'DongDong is thinking…',
     error:'Unable to answer right now. Please try again.', limit:'Today’s prototype request limit has been reached.',
@@ -210,7 +210,7 @@ const AI_COPY = {
   ja: {
     button:'咚咚に聞く', placeholder:'何を探していますか？', send:'送信',
     welcome:'こんにちは、咚咚です。現在はSandboxの模擬モードで、カフェやスイーツのおすすめと店舗カードの流れを試せます。',
-    quick:['カフェをおすすめ','スイーツを探す','何ができる？'],
+    quick:['カフェをおすすめ','お土産を探す','眼鏡を探す'],
     map:'地図で見る', navigate:'ナビ', call:'電話', back:'← おすすめに戻る',
     hours:'営業時間', phone:'電話', waiting:'咚咚が考えています…',
     error:'現在回答を取得できません。後でもう一度お試しください。', limit:'本日のテスト回数の上限に達しました。',
@@ -221,7 +221,7 @@ const AI_COPY = {
   ko: {
     button:'咚咚에게 묻기', placeholder:'무엇을 찾고 있나요?', send:'보내기',
     welcome:'안녕하세요, 咚咚입니다. 현재 Sandbox 모의 모드에서 카페·디저트 추천과 매장 카드 흐름을 테스트할 수 있습니다.',
-    quick:['카페 추천','디저트 찾기','무엇을 할 수 있어?'],
+    quick:['카페 추천','선물 찾기','안경 찾기'],
     map:'지도에서 보기', navigate:'길찾기', call:'전화', back:'← 추천으로 돌아가기',
     hours:'영업시간', phone:'전화', waiting:'咚咚이 생각 중…',
     error:'현재 답변을 가져올 수 없습니다. 잠시 후 다시 시도해 주세요.', limit:'오늘의 테스트 횟수 한도에 도달했습니다.',
@@ -232,7 +232,7 @@ const AI_COPY = {
   th: {
     button:'ถาม咚咚', placeholder:'กำลังมองหาอะไร?', send:'ส่ง',
     welcome:'สวัสดี ฉันคือ咚咚 ขณะนี้เป็นโหมดจำลอง Sandbox สำหรับทดลองการแนะนำคาเฟ่ ของหวาน และการ์ดร้านค้า',
-    quick:['แนะนำคาเฟ่','หาร้านของหวาน','ทำอะไรได้บ้าง?'],
+    quick:['แนะนำคาเฟ่','หาของฝาก','หาร้านแว่นตา'],
     map:'ดูบนแผนที่', navigate:'นำทาง', call:'โทร', back:'← กลับไปที่คำแนะนำ',
     hours:'เวลาเปิด', phone:'โทรศัพท์', waiting:'咚咚กำลังคิด…',
     error:'ขณะนี้ไม่สามารถรับคำตอบได้ กรุณาลองใหม่ภายหลัง', limit:'ถึงขีดจำกัดการทดสอบของวันนี้แล้ว',
@@ -243,7 +243,7 @@ const AI_COPY = {
   vi: {
     button:'Hỏi 咚咚', placeholder:'Bạn đang tìm gì?', send:'Gửi',
     welcome:'Xin chào, tôi là 咚咚. Hiện đây là chế độ mô phỏng Sandbox để thử luồng gợi ý quán cà phê, món ngọt và thẻ cửa hàng.',
-    quick:['Gợi ý quán cà phê','Tìm món ngọt','Bạn làm được gì?'],
+    quick:['Gợi ý quán cà phê','Tìm quà lưu niệm','Tìm kính mắt'],
     map:'Xem trên bản đồ', navigate:'Chỉ đường', call:'Gọi', back:'← Quay lại gợi ý',
     hours:'Giờ mở cửa', phone:'Điện thoại', waiting:'咚咚 đang suy nghĩ…',
     error:'Hiện chưa thể lấy câu trả lời. Vui lòng thử lại sau.', limit:'Đã đạt giới hạn thử nghiệm hôm nay.',
@@ -254,7 +254,7 @@ const AI_COPY = {
   id: {
     button:'Tanya 咚咚', placeholder:'Apa yang Anda cari?', send:'Kirim',
     welcome:'Halo, saya 咚咚. Saat ini mode simulasi Sandbox dapat digunakan untuk mencoba rekomendasi kafe, pencuci mulut, dan alur kartu toko.',
-    quick:['Rekomendasikan kafe','Cari pencuci mulut','Apa yang bisa kamu lakukan?'],
+    quick:['Rekomendasikan kafe','Cari oleh-oleh','Cari kacamata'],
     map:'Lihat di peta', navigate:'Navigasi', call:'Telepon', back:'← Kembali ke rekomendasi',
     hours:'Jam buka', phone:'Telepon', waiting:'咚咚 sedang berpikir…',
     error:'Jawaban belum dapat diperoleh. Silakan coba lagi nanti.', limit:'Batas pengujian hari ini telah tercapai.',
@@ -266,38 +266,38 @@ const AI_COPY = {
 
 const MOCK_COPY = {
   zh:{
-    capability:'我可以先用沙盤資料模擬店家推薦。你可以點選推薦店家，查看完整店家卡，再測試地圖定位、導航、打電話與返回比較。',
-    unsupported:'目前 Sandbox 先支援咖啡與甜點情境。你可以試著問「推薦咖啡」或「找甜點」。',
+    capability:'我目前可以從東門永康商圈 A–J 全類別店家中，依店名、類別與 ai_tags 模擬推薦，再開啟店家卡、地圖定位、導航與電話。',
+    unsupported:'我還無法理解這個需求。可以試著描述想吃的料理、想買的商品或需要的服務，例如「牛肉麵」、「伴手禮」、「剪頭髮」或「眼鏡」。',
     found:count=>`我先找到 ${count} 個適合的選擇。點其中一家可以查看完整店家卡。`
   },
   en:{
-    capability:'I can simulate merchant recommendations with sandbox data. Tap a recommendation to test the merchant card, map view, navigation, calling, and returning to compare.',
-    unsupported:'The current sandbox supports coffee and dessert scenarios. Try “Recommend coffee” or “Find dessert”.',
+    capability:'I can now search all A–J merchant categories in the Dongmen YongKang sandbox using names, categories, and semantic tags, then open merchant cards, map focus, navigation, and calling.',
+    unsupported:'I could not match that request yet. Try describing a food, product, or service such as “beef noodles”, “souvenir”, “haircut”, or “glasses”.',
     found:count=>`I found ${count} suitable options. Tap one to open its full merchant card.`
   },
   ja:{
     capability:'Sandboxデータを使って店舗のおすすめを模擬できます。おすすめをタップすると店舗カードを開き、地図表示、ナビ、電話、比較への戻りを試せます。',
-    unsupported:'現在のSandboxはカフェとスイーツのシナリオに対応しています。「カフェをおすすめ」または「スイーツを探す」と聞いてみてください。',
+    unsupported:'まだこの要望を判断できません。料理、商品、サービスをもう少し具体的に入力してください。',
     found:count=>`${count}件の候補が見つかりました。店舗をタップすると詳しい店舗カードを確認できます。`
   },
   ko:{
     capability:'Sandbox 데이터로 매장 추천을 모의할 수 있습니다. 추천 매장을 누르면 매장 카드, 지도 보기, 길찾기, 전화, 비교 화면 복귀를 테스트할 수 있습니다.',
-    unsupported:'현재 Sandbox는 카페와 디저트 시나리오를 지원합니다. “카페 추천” 또는 “디저트 찾기”를 시도해 보세요.',
+    unsupported:'아직 이 요청을 정확히 이해하지 못했습니다. 음식, 상품 또는 서비스를 조금 더 구체적으로 입력해 주세요.',
     found:count=>`적합한 선택지 ${count}곳을 찾았습니다. 매장을 누르면 전체 매장 카드를 볼 수 있습니다.`
   },
   th:{
     capability:'ฉันสามารถจำลองการแนะนำร้านด้วยข้อมูล Sandbox ได้ แตะร้านที่แนะนำเพื่อทดลองการ์ดร้านค้า การดูแผนที่ การนำทาง การโทร และการกลับมาเปรียบเทียบ',
-    unsupported:'ขณะนี้ Sandbox รองรับสถานการณ์คาเฟ่และของหวาน ลองถามว่า “แนะนำคาเฟ่” หรือ “หาร้านของหวาน”',
+    unsupported:'ยังจับคู่คำขอนี้ไม่ได้ ลองระบุอาหาร สินค้า หรือบริการที่ต้องการให้ชัดเจนขึ้น',
     found:count=>`พบตัวเลือกที่เหมาะสม ${count} แห่ง แตะร้านเพื่อดูการ์ดร้านค้าแบบเต็ม`
   },
   vi:{
     capability:'Tôi có thể mô phỏng gợi ý cửa hàng bằng dữ liệu Sandbox. Hãy chạm vào một gợi ý để thử thẻ cửa hàng, xem bản đồ, chỉ đường, gọi điện và quay lại so sánh.',
-    unsupported:'Sandbox hiện hỗ trợ tình huống quán cà phê và món ngọt. Hãy thử hỏi “Gợi ý quán cà phê” hoặc “Tìm món ngọt”.',
+    unsupported:'Tôi chưa thể khớp yêu cầu này. Hãy mô tả cụ thể hơn món ăn, sản phẩm hoặc dịch vụ bạn cần.',
     found:count=>`Tôi tìm thấy ${count} lựa chọn phù hợp. Chạm vào một cửa hàng để xem thẻ đầy đủ.`
   },
   id:{
     capability:'Saya dapat menyimulasikan rekomendasi toko dengan data Sandbox. Ketuk rekomendasi untuk mencoba kartu toko, tampilan peta, navigasi, telepon, dan kembali membandingkan.',
-    unsupported:'Sandbox saat ini mendukung skenario kafe dan pencuci mulut. Coba tanyakan “Rekomendasikan kafe” atau “Cari pencuci mulut”.',
+    unsupported:'Saya belum dapat mencocokkan permintaan ini. Coba jelaskan makanan, produk, atau layanan yang Anda cari dengan lebih spesifik.',
     found:count=>`Saya menemukan ${count} pilihan yang sesuai. Ketuk salah satu toko untuk membuka kartu lengkap.`
   }
 };
@@ -1108,71 +1108,113 @@ function uniqueMerchants(items) {
 }
 
 
+
 function merchantSemanticTags(merchant) {
   return (Array.isArray(merchant.ai_tags) ? merchant.ai_tags : [])
     .map(tag => String(tag).trim().toLowerCase())
     .filter(Boolean);
 }
 
-function isCoffeeMerchant(merchant) {
+const SEMANTIC_INTENTS = [
+  {query:/咖啡|coffee|cafe|café|コーヒー|カフェ|카페|커피|กาแฟ|cà phê|kopi/, strong:/^(咖啡|咖啡館|精品咖啡|創意咖啡|自烘咖啡|手沖咖啡|單品咖啡|貓咪咖啡館)$/, related:/咖啡/},
+  {query:/茶|tea|お茶|차|ชา|trà|teh/, strong:/(台灣茶|烏龍|紅茶|白茶|普洱|鐵觀音|東方美人|茶葉|茶飲|冷泡茶|冰萃茶|品茶|茶文化|茶具|茗茶)/, related:/茶/},
+  {query:/甜點|dessert|芋頭|taro|冰|ice|蛋糕|cake|brownie|鬆餅|waffle|豆花|chocolate|巧克力|スイーツ|디저트|ของหวาน|món ngọt|pencuci mulut/, strong:/(甜點|冰品|剉冰|雪花冰|豆花|巧克力|布朗尼|蛋糕|鬆餅|芋頭|甜湯|糕餅)/, related:/(甜|冰|餅)/},
+  {query:/牛肉麵|beef noodles?|noodle|麵|ラーメン|국수|ก๋วยเตี๋ยว|mì|mi/, strong:/(牛肉麵|刀削麵|麵食|麵點|擔擔麵|餡餅|水餃|餃子)/, related:/麵/},
+  {query:/火鍋|hot ?pot|shabu|鍋|전골|หม้อไฟ|lẩu/, strong:/(火鍋|涮涮鍋|蒙古火鍋|鍋物)/, related:/鍋/},
+  {query:/小吃|snack|street food|鹹酥雞|麵線|甜不辣|wonton|dumpling|餃子/, strong:/(台灣小吃|街頭小吃|鹹酥雞|麵線|甜不辣|扁食|餃子|水餃)/, related:/小吃/},
+  {query:/台菜|中式|chinese food|taiwanese food|川菜|sichuan|客家|hakka/, strong:/(台菜|川菜|客家菜|中式料理|台灣料理|四川料理)/, related:/(中式|家常菜)/},
+  {query:/泰國|thai|日本料理|japanese|sushi|壽司|德國|german|地中海|mediterranean|牛排|steak|異國/, strong:/(泰國料理|日本料理|壽司|德國料理|地中海料理|牛排|異國料理|西式料理)/, related:/(料理|餐廳)/},
+  {query:/辣|spicy|hot and spicy|麻辣|辛い|매운|เผ็ด|cay|pedas/, strong:/(麻辣|川味|四川|可調辣度|打拋豬)/, related:/辣/},
+  {query:/伴手禮|送禮|禮物|gift|souvenir|お土産|선물|ของฝาก|quà|oleh-oleh/, strong:/(伴手禮|送禮|禮盒|禮品|紀念禮品)/, related:/(禮|糕餅|點心)/},
+  {query:/烘焙|烘培|bakery|bread|麵包|餅|pastry/, strong:/(烘焙|糕餅|麵包|蛋捲|牛軋餅|鳳梨酥|太陽餅|芋頭酥)/, related:/餅/},
+  {query:/寵物|pet|dog|cat|毛孩|สัตว์เลี้ยง|thú cưng|hewan peliharaan/, strong:/(寵物用品|犬貓用品|寵物食品|寵物玩具|毛孩)/, related:/寵物/},
+  {query:/輪胎|汽車|car|tire|tyre|auto|vehicle/, strong:/(輪胎|汽車保養|汽車維修|引擎電機|鋁圈|汽車服務)/, related:/汽車/},
+  {query:/銀行|bank|atm/, strong:/(銀行|金融|提款|ATM)/i, related:/銀行/},
+  {query:/房屋|租屋|不動產|real estate|rent|property/, strong:/(不動產|房屋租賃|房屋買賣|房地產|租屋)/, related:/房/},
+  {query:/雨傘|傘|umbrella/, strong:/(雨傘|傘|生活用品)/, related:/傘/},
+  {query:/台灣設計|文創|設計|taiwan design|design goods|creative|文化|culture|art|藝術/, strong:/(台灣設計|文創|生活設計|台灣風格|藝術展覽|藝文空間|藝術創作|文化體驗|藝術選物)/, related:/(設計|藝術|文創|美學)/},
+  {query:/珠寶|jewelry|jewellery|飾品|首飾/, strong:/(珠寶|珠寶訂製|飾品|精品|紀念珠寶)/, related:/珠寶/},
+  {query:/陶藝|陶瓷|pottery|ceramic|茶器/, strong:/(陶瓷茶器|陶藝|手作陶器|茶具)/, related:/陶/},
+  {query:/音樂|music|樂器|guitar|吉他/, strong:/(音樂|樂器|吉他|音樂空間)/, related:/音樂/},
+  {query:/剪頭髮|剪髮|美髮|haircut|hair salon|salon|髮型|미용실|ร้านทำผม|cắt tóc|potong rambut/, strong:/(美髮|剪髮|髮型設計|美髮沙龍|洗髮|染髮|燙髮)/, related:/髮/},
+  {query:/保養|護膚|skincare|beauty|香芬|香水|perfume|精油|aroma/, strong:/(保養|臉部保養|天然保養|精油|香水|香芬|青草保養|漢方養生)/, related:/(保養|香)/},
+  {query:/按摩|足體|massage|foot massage|spa|นวด|mát xa|pijat/, strong:/(足體|按摩|養生館|SPA)/i, related:/(養生|舒壓)/},
+  {query:/診所|醫療|醫生|doctor|clinic|medical|藥局|pharmacy|薬局|병원|คลินิก|phòng khám|apotek/, strong:/(診所|家庭醫學|醫療|藥局|藥師)/, related:/(醫|藥)/},
+  {query:/眼鏡|glasses|eyeglasses|optical|optician|驗光|メガネ|안경|แว่น|kính mắt|kacamata/, strong:/(眼鏡|驗光配鏡|鏡片|多焦鏡片|精品眼鏡|客製眼鏡)/, related:/(眼鏡|鏡片)/},
+  {query:/鞋|shoes?|footwear|sneaker|涼鞋|靴|신발|รองเท้า|giày|sepatu/, strong:/(健康鞋|舒適鞋|休閒鞋|運動鞋|涼鞋|男鞋|鞋)/, related:/鞋/},
+  {query:/衣服|服飾|clothes|clothing|fashion|旗袍|qipao|女裝|ファッション|옷|เสื้อผ้า|quần áo|pakaian/, strong:/(服飾|女裝|旗袍|中國風服飾|棉麻服飾|時尚)/, related:/(服飾|衣)/},
+  {query:/皮革|leather|皮件|包包|bag/, strong:/(皮革|皮件|皮鞋|包|手工皮件)/, related:/皮/}
+];
+
+function semanticScore(merchant, q) {
   const tags = merchantSemanticTags(merchant);
-  const strong = [
-    '咖啡','咖啡館','精品咖啡','創意咖啡','自烘咖啡','手沖咖啡',
-    'specialty coffee','coffee','cafe','café'
-  ];
-  return tags.some(tag =>
-    strong.includes(tag) ||
-    /咖啡館|精品咖啡|自烘咖啡|手沖咖啡|創意咖啡/.test(tag)
-  );
+  const tagText = tags.join(' ');
+  const nameZh = String(merchant.zh || merchant.name_zh || '').toLowerCase();
+  const nameEn = String(merchant.en || merchant.name_en || '').toLowerCase();
+  const category = String(merchant.cat || merchant.category || '').toLowerCase();
+  const desc = String(merchant.desc || merchant.description_zh || '').toLowerCase();
+  let score = 0;
+
+  if (q && (nameZh.includes(q) || nameEn.includes(q))) score += 100;
+
+  const directTokens = q.match(/[\p{Script=Han}]{2,}|[a-zà-ỹก-๙가-힣ぁ-んァ-ンー]{3,}/giu) || [];
+  for (const token of directTokens) {
+    const t = token.toLowerCase();
+    if (tags.some(tag => tag === t)) score += 20;
+    else if (tags.some(tag => tag.includes(t) || t.includes(tag))) score += 8;
+    if (nameZh.includes(t) || nameEn.includes(t)) score += 14;
+    if (category.includes(t)) score += 3;
+    if (desc.includes(t)) score += 2;
+  }
+
+  for (const intent of SEMANTIC_INTENTS) {
+    if (!intent.query.test(q)) continue;
+    intent.query.lastIndex = 0;
+    let strongHits = 0;
+    let relatedHits = 0;
+    for (const tag of tags) {
+      intent.strong.lastIndex = 0;
+      intent.related.lastIndex = 0;
+      if (intent.strong.test(tag)) strongHits += 1;
+      else if (intent.related.test(tag)) relatedHits += 1;
+    }
+    score += strongHits * 24 + relatedHits * 6;
+  }
+
+  return score;
 }
 
-function isTeaMerchant(merchant) {
-  const tags = merchantSemanticTags(merchant);
-  return tags.some(tag =>
-    !/^下午茶$/.test(tag) &&
-    /(台灣茶|烏龍|紅茶|白茶|普洱|鐵觀音|東方美人|茶葉|茶飲|冷泡茶|冰萃茶|品茶|茶文化|茶具|茗茶|tea)/.test(tag)
-  );
-}
-
-function isDessertMerchant(merchant) {
-  const tags = merchantSemanticTags(merchant);
-  return tags.some(tag =>
-    /(甜點|冰品|剉冰|雪花冰|豆花|巧克力|布朗尼|蛋糕|鬆餅|餅|芋頭|甜湯|dessert|cake|waffle|chocolate)/.test(tag)
-  );
+function rankMerchantsForQuery(catalog, q) {
+  return catalog
+    .map((merchant, index) => ({merchant, index, score:semanticScore(merchant, q)}))
+    .filter(item => item.score > 0)
+    .sort((a,b) => b.score - a.score || a.index - b.index)
+    .map(item => item.merchant);
 }
 
 function mockAnswer(question) {
   const q = String(question || '').trim().toLowerCase();
   const copy = MOCK_COPY[conversationLang] || MOCK_COPY.en;
   const catalog = MERCHANT_CATALOG;
-  let matches = [];
 
   const capabilityPattern = /你可以做什麼|what can you do|可以做什麼|何ができる|무엇을 할 수|ทำอะไรได้บ้าง|bạn làm được gì|apa yang bisa kamu lakukan/;
   if (capabilityPattern.test(q)) {
     return {answer:copy.capability, cards:[]};
   }
 
-  // Exact / partial merchant-name lookup remains highest priority.
+  let matches = [];
+
+  // Exact merchant-name lookup remains highest priority.
   if (q) {
     matches = catalog.filter(merchant => {
       const zh = String(merchant.zh || merchant.name_zh || '').toLowerCase();
       const en = String(merchant.en || merchant.name_en || '').toLowerCase();
-      return (zh && (q.includes(zh) || zh.includes(q))) ||
-             (en && (q.includes(en) || en.includes(q)));
+      return (zh && q.includes(zh)) || (en && q.includes(en));
     });
   }
 
-  // Semantic filtering uses ai_tags from merchant_mapping, NOT the broad My Maps category label.
-  if (!matches.length && /咖啡|coffee|cafe|café|コーヒー|カフェ|카페|커피|กาแฟ|cà phê|kopi/.test(q)) {
-    matches = catalog.filter(isCoffeeMerchant);
-  }
-
-  if (!matches.length && /茶|tea|ชา|trà|teh|お茶|차/.test(q)) {
-    matches = catalog.filter(isTeaMerchant);
-  }
-
-  if (!matches.length && /甜點|dessert|芋頭|taro|冰|ice|蛋糕|cake|brownie|鬆餅|waffle|豆花|chocolate|巧克力|スイーツ|デザート|디저트|ของหวาน|món ngọt|tráng miệng|pencuci mulut/.test(q)) {
-    matches = catalog.filter(isDessertMerchant);
+  if (!matches.length) {
+    matches = rankMerchantsForQuery(catalog, q);
   }
 
   matches = uniqueMerchants(matches).slice(0,3);

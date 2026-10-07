@@ -1156,6 +1156,9 @@ function semanticScore(merchant, q) {
   let score = 0;
 
   if (q && (nameZh.includes(q) || nameEn.includes(q))) score += 100;
+  for (const tag of tags) {
+    if (tag.length >= 2 && q.includes(tag)) score += 30;
+  }
 
   const directTokens = q.match(/[\p{Script=Han}]{2,}|[a-zà-ỹก-๙가-힣ぁ-んァ-ンー]{3,}/giu) || [];
   for (const token of directTokens) {
@@ -1185,9 +1188,15 @@ function semanticScore(merchant, q) {
 }
 
 function rankMerchantsForQuery(catalog, q) {
+  const hasKnownIntent = SEMANTIC_INTENTS.some(intent => {
+    intent.query.lastIndex = 0;
+    return intent.query.test(q);
+  });
+  const minimumScore = hasKnownIntent ? 6 : 3;
+
   return catalog
     .map((merchant, index) => ({merchant, index, score:semanticScore(merchant, q)}))
-    .filter(item => item.score > 0)
+    .filter(item => item.score >= minimumScore)
     .sort((a,b) => b.score - a.score || a.index - b.index)
     .map(item => item.merchant);
 }

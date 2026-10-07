@@ -40,7 +40,7 @@ const COPY = {
 };
 
 
-const DEMO_MERCHANTS = [
+const FALLBACK_MERCHANTS = [
   {
     id:'DMYK-DEMO-001',
     name_zh:'YABOO Cafe 鴉埠咖啡',
@@ -115,6 +115,12 @@ const DEMO_MERCHANTS = [
   }
 ];
 
+const MERCHANT_CATALOG =
+  Array.isArray(window.DMYK_MERCHANTS) && window.DMYK_MERCHANTS.length
+    ? window.DMYK_MERCHANTS
+    : FALLBACK_MERCHANTS;
+
+
 const languageScreen = document.getElementById('languageScreen');
 const mapScreen = document.getElementById('mapScreen');
 const mapFrame = document.getElementById('mapFrame');
@@ -187,7 +193,7 @@ const AI_COPY = {
     hours:'營業時間', phone:'電話', waiting:'咚咚正在想…',
     error:'目前無法取得回覆，請稍後再試。', limit:'今天的測試次數已達上限。',
     showing:'已在地圖上顯示', photoPending:'Mock Photo',
-    dataNote:'Sandbox Mock：此資料只供介面演練；之後將改由 Google Drive Google Sheet 單一資料源驅動。',
+    dataNote:'Sandbox：店家資料由 261007_A 店家表單衍生；正式資料源仍以店家表單／後續 Google Sheet 為準。',
     prototype:'Sandbox Mock · $0 API', navigateShop:'導航至店家', returnDongDong:'回到咚咚'
   },
   en: {
@@ -198,7 +204,7 @@ const AI_COPY = {
     hours:'Hours', phone:'Phone', waiting:'DongDong is thinking…',
     error:'Unable to answer right now. Please try again.', limit:'Today’s prototype request limit has been reached.',
     showing:'Showing on map', photoPending:'Mock Photo',
-    dataNote:'Sandbox Mock only. Production data will later come from the Google Drive Google Sheet single source of truth.',
+    dataNote:'Sandbox merchant data is derived from the 261007_A workbook; the workbook / future Google Sheet remains canonical.',
     prototype:'Sandbox Mock · $0 API', navigateShop:'Navigate to shop', returnDongDong:'Return to Dong-Dong'
   },
   ja: {
@@ -1014,41 +1020,97 @@ function returnToDongDong() {
 }
 
 function merchantToCard(merchant) {
+  const nameZh = merchant.zh || merchant.name_zh || '';
+  const nameEn = merchant.en || merchant.name_en || '';
+  const address = merchant.address || merchant.address_zh || merchant.address_en || '';
+  const category = merchant.cat || merchant.category || '';
+  const description = merchant.desc || merchant.description_zh || merchant.description_en || '';
+  const hours = merchant.hours || merchant.hours_zh || merchant.hours_en || '';
+  const id = merchant.id || merchant.merchant_id || '';
+  const categoryCode = merchant.cc || merchant.category_code || '';
+
   return {
-    merchant_id:merchant.id,
-    name:conversationLang === 'zh' ? merchant.name_zh : merchant.name_en,
-    subtitle:conversationLang === 'zh' ? merchant.address_zh : merchant.address_en,
-    category:merchant.category,
-    category_label:conversationLang === 'zh' ? merchant.category_zh : merchant.category_en,
-    description:conversationLang === 'zh' ? merchant.description_zh : merchant.description_en,
-    hours:conversationLang === 'zh' ? merchant.hours_zh : merchant.hours_en,
-    phone:merchant.phone,
-    phone_display:merchant.phone_display,
-    photos:[],
+    merchant_id:id,
+    name:conversationLang === 'zh' ? nameZh : (nameEn || nameZh),
+    name_zh:nameZh,
+    name_en:nameEn,
+    subtitle:address,
+    category:categoryCode || category,
+    category_label:category,
+    description,
+    hours,
+    phone:merchant.phone || '',
+    phone_display:merchant.phone_display || merchant.phone || '',
+    photos:Array.isArray(merchant.photos) ? merchant.photos : [],
     google_place_id:merchant.google_place_id || '',
     lat:merchant.lat,
-    lng:merchant.lng
+    lng:merchant.lng,
+    photo_folder:merchant.photo_folder || ''
   };
 }
 
+function merchantSearchText(merchant) {
+  return [
+    merchant.zh, merchant.name_zh,
+    merchant.en, merchant.name_en,
+    merchant.cat, merchant.category,
+    merchant.desc, merchant.description_zh,
+    merchant.address, merchant.address_zh
+  ].filter(Boolean).join(' ').toLowerCase();
+}
+
+function uniqueMerchants(items) {
+  const seen = new Set();
+  return items.filter(item => {
+    const id = item.id || item.merchant_id;
+    if (!id || seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
+
 function mockAnswer(question) {
-  const q = String(question || '').toLowerCase();
+  const q = String(question || '').trim().toLowerCase();
   const copy = MOCK_COPY[conversationLang] || MOCK_COPY.en;
+  const catalog = MERCHANT_CATALOG;
   let matches = [];
 
-  const coffeePattern = /咖啡|coffee|cafe|café|安靜|quiet|下午茶|コーヒー|カフェ|카페|커피|กาแฟ|cà phê|cafe|kopi/;
-  const dessertPattern = /甜點|dessert|芋頭|taro|冰|ice|スイーツ|デザート|디저트|ของหวาน|ขนม|món ngọt|tráng miệng|pencuci mulut|dessert/;
   const capabilityPattern = /你可以做什麼|what can you do|可以做什麼|何ができる|무엇을 할 수|ทำอะไรได้บ้าง|bạn làm được gì|apa yang bisa kamu lakukan/;
-
-  if (coffeePattern.test(q)) {
-    matches = DEMO_MERCHANTS.filter(m => m.category === 'coffee').slice(0,3);
-  } else if (dessertPattern.test(q)) {
-    matches = DEMO_MERCHANTS.filter(m => m.category === 'dessert').slice(0,3);
-  }
-
   if (capabilityPattern.test(q)) {
     return {answer:copy.capability, cards:[]};
   }
+
+  // Direct merchant-name matching first.
+  if (q) {
+    matches = catalog.filter(merchant => {
+      const zh = String(merchant.zh || merchant.name_zh || '').toLowerCase();
+      const en = String(merchant.en || merchant.name_en || '').toLowerCase();
+      return (zh && q.includes(zh)) || (en && q.includes(en));
+    });
+  }
+
+  // Category / intent matching for the current Sandbox scenarios.
+  if (!matches.length && /咖啡|coffee|cafe|café|安靜|quiet|下午茶|コーヒー|カフェ|카페|커피|กาแฟ|cà phê|kopi/.test(q)) {
+    matches = catalog.filter(merchant =>
+      /咖啡|coffee|cafe|café/.test(merchantSearchText(merchant))
+    );
+  }
+
+  if (!matches.length && /甜點|dessert|芋頭|taro|冰|ice|蛋糕|cake|烘培|烘焙|brownie|鬆餅|waffle|豆花|chocolate|巧克力|スイーツ|デザート|디저트|ของหวาน|món ngọt|tráng miệng|pencuci mulut/.test(q)) {
+    matches = catalog.filter(merchant => {
+      const code = merchant.cc || merchant.category_code;
+      return code === 'D' || code === 'F';
+    });
+  }
+
+  if (!matches.length && /茶|tea|ชา|trà|teh|お茶|차/.test(q)) {
+    matches = catalog.filter(merchant =>
+      (merchant.cc || merchant.category_code) === 'E' &&
+      /茶|tea/.test(merchantSearchText(merchant))
+    );
+  }
+
+  matches = uniqueMerchants(matches).slice(0,3);
 
   if (!matches.length) {
     return {answer:copy.unsupported, cards:[]};

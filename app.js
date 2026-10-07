@@ -1165,7 +1165,11 @@ function semanticScore(merchant, q) {
     const t = token.toLowerCase();
     if (tags.some(tag => tag === t)) score += 20;
     else if (tags.some(tag => tag.includes(t) || t.includes(tag))) score += 8;
-    if (nameZh.includes(t) || nameEn.includes(t)) score += 14;
+    const latinToken = /^[a-zà-ỹ]+$/i.test(t);
+    const nameEnMatch = latinToken
+      ? nameEn.split(/[^a-zà-ỹ]+/i).includes(t)
+      : nameEn.includes(t);
+    if (nameZh.includes(t) || nameEnMatch) score += 14;
     if (category.includes(t)) score += 3;
     if (desc.includes(t)) score += 2;
   }

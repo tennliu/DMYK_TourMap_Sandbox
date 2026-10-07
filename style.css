@@ -99,7 +99,7 @@ body{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .ai-quick-prompts::-webkit-scrollbar{display:none}
 .ai-quick-btn{flex:0 0 auto;min-height:31px;border:1px solid #d9d9d9;border-radius:16px;padding:0 11px;background:#fff;color:#444;font-size:11.5px;cursor:pointer}
 .ai-form{display:flex;gap:8px;padding:10px 12px max(12px,env(safe-area-inset-bottom));border-top:1px solid #ececec;background:#fff}
-.ai-input{flex:1;min-width:0;height:40px;border:1px solid #d4d4d4;border-radius:20px;padding:0 13px;background:#fff;color:#222;font-size:13px;outline:none}
+.ai-input{flex:1;min-width:0;height:40px;border:1px solid #d4d4d4;border-radius:20px;padding:0 13px;background:#fff;color:#222;font-size:16px;outline:none}
 .ai-input:focus{border-color:#910000}
 .ai-send-btn{height:40px;border:0;border-radius:20px;padding:0 15px;background:#910000;color:#fff;font-size:12px;font-weight:800;cursor:pointer}
 .ai-send-btn:disabled,.ai-input:disabled{opacity:.55}
@@ -144,3 +144,17 @@ body{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .map-screen.is-merchant-focus .ai-btn,
 .map-screen.is-merchant-focus .side-btn,
 .map-screen.is-merchant-focus .location-status{opacity:0;visibility:hidden;pointer-events:none}
+
+
+/* Mobile viewport + keyboard containment */
+body.map-active{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
+body.map-active .app-stage,
+body.map-active .phone-shell{overflow:hidden}
+.ai-panel{bottom:var(--keyboard-inset,0px);max-height:calc(100% - var(--keyboard-inset,0px))}
+.ai-input{-webkit-text-size-adjust:100%}
+
+/* Merchant focus: beacon is temporary; distance remains with navigation */
+.merchant-focus-distance{display:none}
+.merchant-focus-action{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50px;line-height:1.15}
+.merchant-focus-action-distance{display:none;margin-top:3px;font-size:10px;font-weight:700;opacity:.88;white-space:nowrap}
+.merchant-focus-action-distance.is-visible{display:block}

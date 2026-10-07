@@ -1045,7 +1045,10 @@ function merchantToCard(merchant) {
     google_place_id:merchant.google_place_id || '',
     lat:merchant.lat,
     lng:merchant.lng,
-    photo_folder:merchant.photo_folder || ''
+    photo_folder:merchant.photo_folder || '',
+    photo_files:Array.isArray(merchant.photo_files) ? merchant.photo_files : [],
+    photo_part:merchant.photo_part || null,
+    ai_tags:Array.isArray(merchant.ai_tags) ? merchant.ai_tags : []
   };
 }
 
@@ -1069,6 +1072,40 @@ function uniqueMerchants(items) {
   });
 }
 
+
+function merchantSemanticTags(merchant) {
+  return (Array.isArray(merchant.ai_tags) ? merchant.ai_tags : [])
+    .map(tag => String(tag).trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function isCoffeeMerchant(merchant) {
+  const tags = merchantSemanticTags(merchant);
+  const strong = [
+    '咖啡','咖啡館','精品咖啡','創意咖啡','自烘咖啡','手沖咖啡',
+    'specialty coffee','coffee','cafe','café'
+  ];
+  return tags.some(tag =>
+    strong.includes(tag) ||
+    /咖啡館|精品咖啡|自烘咖啡|手沖咖啡|創意咖啡/.test(tag)
+  );
+}
+
+function isTeaMerchant(merchant) {
+  const tags = merchantSemanticTags(merchant);
+  return tags.some(tag =>
+    !/^下午茶$/.test(tag) &&
+    /(台灣茶|烏龍|紅茶|白茶|普洱|鐵觀音|東方美人|茶葉|茶飲|冷泡茶|冰萃茶|品茶|茶文化|茶具|茗茶|tea)/.test(tag)
+  );
+}
+
+function isDessertMerchant(merchant) {
+  const tags = merchantSemanticTags(merchant);
+  return tags.some(tag =>
+    /(甜點|冰品|剉冰|雪花冰|豆花|巧克力|布朗尼|蛋糕|鬆餅|餅|芋頭|甜湯|dessert|cake|waffle|chocolate)/.test(tag)
+  );
+}
+
 function mockAnswer(question) {
   const q = String(question || '').trim().toLowerCase();
   const copy = MOCK_COPY[conversationLang] || MOCK_COPY.en;
@@ -1080,34 +1117,27 @@ function mockAnswer(question) {
     return {answer:copy.capability, cards:[]};
   }
 
-  // Direct merchant-name matching first.
+  // Exact / partial merchant-name lookup remains highest priority.
   if (q) {
     matches = catalog.filter(merchant => {
       const zh = String(merchant.zh || merchant.name_zh || '').toLowerCase();
       const en = String(merchant.en || merchant.name_en || '').toLowerCase();
-      return (zh && q.includes(zh)) || (en && q.includes(en));
+      return (zh && (q.includes(zh) || zh.includes(q))) ||
+             (en && (q.includes(en) || en.includes(q)));
     });
   }
 
-  // Category / intent matching for the current Sandbox scenarios.
-  if (!matches.length && /咖啡|coffee|cafe|café|安靜|quiet|下午茶|コーヒー|カフェ|카페|커피|กาแฟ|cà phê|kopi/.test(q)) {
-    matches = catalog.filter(merchant =>
-      /咖啡|coffee|cafe|café/.test(merchantSearchText(merchant))
-    );
-  }
-
-  if (!matches.length && /甜點|dessert|芋頭|taro|冰|ice|蛋糕|cake|烘培|烘焙|brownie|鬆餅|waffle|豆花|chocolate|巧克力|スイーツ|デザート|디저트|ของหวาน|món ngọt|tráng miệng|pencuci mulut/.test(q)) {
-    matches = catalog.filter(merchant => {
-      const code = merchant.cc || merchant.category_code;
-      return code === 'D' || code === 'F';
-    });
+  // Semantic filtering uses ai_tags from merchant_mapping, NOT the broad My Maps category label.
+  if (!matches.length && /咖啡|coffee|cafe|café|コーヒー|カフェ|카페|커피|กาแฟ|cà phê|kopi/.test(q)) {
+    matches = catalog.filter(isCoffeeMerchant);
   }
 
   if (!matches.length && /茶|tea|ชา|trà|teh|お茶|차/.test(q)) {
-    matches = catalog.filter(merchant =>
-      (merchant.cc || merchant.category_code) === 'E' &&
-      /茶|tea/.test(merchantSearchText(merchant))
-    );
+    matches = catalog.filter(isTeaMerchant);
+  }
+
+  if (!matches.length && /甜點|dessert|芋頭|taro|冰|ice|蛋糕|cake|brownie|鬆餅|waffle|豆花|chocolate|巧克力|スイーツ|デザート|디저트|ของหวาน|món ngọt|tráng miệng|pencuci mulut/.test(q)) {
+    matches = catalog.filter(isDessertMerchant);
   }
 
   matches = uniqueMerchants(matches).slice(0,3);

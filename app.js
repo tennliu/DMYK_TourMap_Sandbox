@@ -1730,7 +1730,12 @@ function syncAppScale() {
   const inputFocused = document.activeElement === aiInput;
   if (!inputFocused) stableViewportHeight = window.innerHeight;
   const vh = inputFocused ? stableViewportHeight : window.innerHeight;
-  appScale = vw <= PHONE_BREAKPOINT ? vw / MASTER_WIDTH : 1;
+
+  // Some iOS in-app browsers request a desktop-sized layout viewport even
+  // on an iPhone. Keep the 390px mobile canvas scaled to the actual viewport,
+  // instead of leaving it as a small strip over an empty red page.
+  const isHandset = /iPhone|iPod|Android.*Mobile/i.test(navigator.userAgent);
+  appScale = (vw <= PHONE_BREAKPOINT || isHandset) ? vw / MASTER_WIDTH : 1;
 
   appStage.style.width = `${MASTER_WIDTH * appScale}px`;
   appStage.style.height = `${vh}px`;

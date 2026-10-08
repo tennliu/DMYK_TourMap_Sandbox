@@ -155,6 +155,9 @@ const shareBtn = document.getElementById('shareBtn');
 const languageBtn = document.getElementById('languageBtn');
 const closeBtn = document.getElementById('closeBtn');
 const sideBtn = document.getElementById('sideBtn');
+const radialMenu = document.getElementById('radialMenu');
+const radialMenuBackdrop = document.getElementById('radialMenuBackdrop');
+const heroMenuBtn = document.getElementById('heroMenuBtn');
 const locateBtn = document.getElementById('locateBtn');
 const locateLabel = document.getElementById('locateLabel');
 const locationBeacon = document.getElementById('locationBeacon');
@@ -361,6 +364,7 @@ function applyOverlayCopy(lang) {
 }
 
 function openMap(lang) {
+  closeRadialMenu();
   exitMerchantFocus();
   cancelLocationPeek(true);
   currentLang = lang;
@@ -380,6 +384,7 @@ function openMap(lang) {
 }
 
 function showLanguagePage() {
+  closeRadialMenu();
   exitMerchantFocus();
   cancelLocationPeek(true);
   closeAiPanel();
@@ -392,7 +397,25 @@ function showLanguagePage() {
   window.scrollTo(0,0);
 }
 
+function setRadialMenu(open) {
+  if (!radialMenu || !heroMenuBtn || !radialMenuBackdrop) return;
+  radialMenu.classList.toggle('is-open', open);
+  radialMenuBackdrop.classList.toggle('is-visible', open);
+  radialMenuBackdrop.setAttribute('aria-hidden', open ? 'false' : 'true');
+  heroMenuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  heroMenuBtn.setAttribute('aria-label', open ? '收合地圖功能' : '開啟地圖功能');
+}
+
+function closeRadialMenu() {
+  setRadialMenu(false);
+}
+
+function toggleRadialMenu() {
+  setRadialMenu(!radialMenu.classList.contains('is-open'));
+}
+
 function openOverlay() {
+  closeRadialMenu();
   overlay.classList.add('is-visible');
   overlay.setAttribute('aria-hidden','false');
 }
@@ -554,6 +577,7 @@ function handleLocationError(error) {
 }
 
 function startLocationPeek() {
+  closeRadialMenu();
   if (locationPeekActive) return;
   if (!navigator.geolocation) {
     showLocationStatus('此瀏覽器不支援定位 / Geolocation unavailable', 3600);
@@ -580,6 +604,7 @@ function refreshAiHeaderTitle() {
 }
 
 function openAiPanel() {
+  closeRadialMenu();
   refreshAiHeaderTitle();
   aiPanel.classList.add('is-visible');
   aiBackdrop.classList.add('is-visible');
@@ -1151,6 +1176,7 @@ function revealMerchantFocusBeacon(token) {
 }
 
 function enterMerchantFocus(card) {
+  closeRadialMenu();
   clearTimeout(merchantFocusTimer);
   clearTimeout(merchantFocusLoadTimer);
   const token = ++merchantFocusToken;
@@ -1575,11 +1601,22 @@ aiInput.addEventListener('blur', () => {
 document.querySelectorAll('.lang-btn').forEach(btn => {
   btn.addEventListener('click', () => openMap(btn.dataset.lang));
 });
-sideBtn.addEventListener('click', openOverlay);
+heroMenuBtn.addEventListener('click', toggleRadialMenu);
+radialMenuBackdrop.addEventListener('click', closeRadialMenu);
+sideBtn.addEventListener('click', () => {
+  closeRadialMenu();
+  openOverlay();
+});
 closeBtn.addEventListener('click', closeOverlay);
 languageBtn.addEventListener('click', showLanguagePage);
-locateBtn.addEventListener('click', startLocationPeek);
-aiBtn.addEventListener('click', openAiPanel);
+locateBtn.addEventListener('click', () => {
+  closeRadialMenu();
+  startLocationPeek();
+});
+aiBtn.addEventListener('click', () => {
+  closeRadialMenu();
+  openAiPanel();
+});
 aiCloseBtn.addEventListener('click', closeAiPanel);
 aiBackdrop.addEventListener('click', closeAiPanel);
 merchantNavigateBtn.addEventListener('click', () => {
@@ -1603,6 +1640,11 @@ aiForm.addEventListener('submit', e => {
   submitAiQuestion(aiInput.value);
 });
 overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && radialMenu && radialMenu.classList.contains('is-open')) {
+    closeRadialMenu();
+  }
+});
 
 shareBtn.addEventListener('click', async () => {
   const url = `${location.origin}${location.pathname}`;

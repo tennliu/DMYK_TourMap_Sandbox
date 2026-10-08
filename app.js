@@ -1369,10 +1369,21 @@ function rankMerchantCandidates(catalog, q) {
 }
 
 function fairRandomizeCandidates(items) {
-  return items
+  if (!items.length) return [];
+  const topScore = items[0].score;
+  const highTier = items.filter(item => item.score >= topScore - 24);
+  const lowerTier = items.filter(item => item.score < topScore - 24);
+
+  for (let i = highTier.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [highTier[i], highTier[j]] = [highTier[j], highTier[i]];
+  }
+
+  const randomizedLower = lowerTier
     .map(item => ({...item, fairScore:item.score + Math.random() * 6}))
-    .sort((a,b) => b.fairScore - a.fairScore || b.score - a.score || a.index - b.index)
-    .map(item => item.merchant);
+    .sort((a,b) => b.fairScore - a.fairScore || b.score - a.score || a.index - b.index);
+
+  return [...highTier, ...randomizedLower].map(item => item.merchant);
 }
 
 function normalizeMerchantName(value) {
@@ -1393,7 +1404,8 @@ function findSpecificMerchantMatches(catalog, q) {
   });
   if (fullMatches.length) return uniqueMerchants(fullMatches);
 
-  if (hasKnownSemanticIntent(q) || normalizedQ.length < 3) return [];
+  if (normalizedQ.length < 3) return [];
+  if (hasKnownSemanticIntent(q) && normalizedQ.length < 4) return [];
 
   const partialMatches = catalog.filter(merchant => {
     const zh = normalizeMerchantName(merchant.zh || merchant.name_zh);
@@ -1506,36 +1518,7 @@ async function submitAiQuestion(rawQuestion) {
   }
 }
 
-async function submitAiQuestion(rawQuestion) {
-  const question = String(rawQuestion || '').trim();
-  if (!question || aiSending) return;
 
-  addAiMessage('user', question);
-  aiInput.value = '';
-  aiSending = true;
-  aiInput.disabled = true;
-  aiSendBtn.disabled = true;
-  const loadingRow = addAiLoading();
-
-  try {
-    await new Promise(resolve => setTimeout(resolve, 650));
-    const data = mockAnswer(question);
-    loadingRow.remove();
-
-    addAiMessage('assistant', data.answer, data.cards || []);
-    aiHistory.push({role:'user',content:question},{role:'assistant',content:data.answer});
-    aiHistory = aiHistory.slice(-8);
-    aiModeLabel.textContent = getAiCopy().prototype;
-  } catch (_) {
-    if (loadingRow.isConnected) loadingRow.remove();
-    addAiMessage('assistant', getAiCopy().error);
-  } finally {
-    aiSending = false;
-    aiInput.disabled = false;
-    aiSendBtn.disabled = false;
-    aiInput.focus();
-  }
-}
 
 const MASTER_WIDTH = 390;
 const PHONE_BREAKPOINT = 600;

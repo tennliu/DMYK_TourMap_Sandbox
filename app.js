@@ -158,8 +158,11 @@ const sideBtn = document.getElementById('sideBtn');
 const radialMenu = document.getElementById('radialMenu');
 const radialMenuBackdrop = document.getElementById('radialMenuBackdrop');
 const heroMenuBtn = document.getElementById('heroMenuBtn');
-const locateBtn = document.getElementById('locateBtn');
-const locateLabel = document.getElementById('locateLabel');
+const locateBtn = document.getElementById('mrtBtn');
+const locateLabel = document.getElementById('mrtLabel');
+const mrtBackdrop = document.getElementById('mrtBackdrop');
+const mrtPanel = document.getElementById('mrtPanel');
+const mrtCloseBtn = document.getElementById('mrtCloseBtn');
 const locationBeacon = document.getElementById('locationBeacon');
 const locationStatus = document.getElementById('locationStatus');
 const aiBtn = document.getElementById('aiBtn');
@@ -384,6 +387,7 @@ function applyOverlayCopy(lang) {
 }
 
 function openMap(lang) {
+  closeMrtPanel();
   closeRadialMenu();
   exitMerchantFocus();
   cancelLocationPeek(true);
@@ -404,6 +408,7 @@ function openMap(lang) {
 }
 
 function showLanguagePage() {
+  closeMrtPanel();
   closeRadialMenu();
   exitMerchantFocus();
   cancelLocationPeek(true);
@@ -415,6 +420,26 @@ function showLanguagePage() {
   phoneShell.style.setProperty('--keyboard-inset','0px');
   languageScreen.classList.remove('is-hidden');
   window.scrollTo(0,0);
+}
+
+function openMrtPanel() {
+  closeRadialMenu();
+  closeAiPanel();
+  closeMerchantLinksSheet();
+  closeOverlay();
+  if (!mrtPanel || !mrtBackdrop) return;
+  mrtPanel.classList.add('is-visible');
+  mrtBackdrop.classList.add('is-visible');
+  mrtPanel.setAttribute('aria-hidden','false');
+  mrtBackdrop.setAttribute('aria-hidden','false');
+}
+
+function closeMrtPanel() {
+  if (!mrtPanel || !mrtBackdrop) return;
+  mrtPanel.classList.remove('is-visible');
+  mrtBackdrop.classList.remove('is-visible');
+  mrtPanel.setAttribute('aria-hidden','true');
+  mrtBackdrop.setAttribute('aria-hidden','true');
 }
 
 function setRadialMenu(open) {
@@ -435,6 +460,7 @@ function toggleRadialMenu() {
 }
 
 function openOverlay() {
+  closeMrtPanel();
   closeRadialMenu();
   overlay.classList.add('is-visible');
   overlay.setAttribute('aria-hidden','false');
@@ -455,23 +481,12 @@ function showLocationStatus(message, duration = 2200) {
   }
 }
 
-function setLocateButton(mode = 'idle') {
-  const loading = mode === 'loading';
-  const active = mode === 'active';
-  const returning = mode === 'returning';
-
-  locateBtn.classList.toggle('is-loading', loading);
-  locateBtn.classList.toggle('is-active', active || returning);
-  locateBtn.disabled = loading || active || returning;
-  locateBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
-
-  locateLabel.textContent = loading
-    ? '定位中'
-    : active
-      ? '我在這裡'
-      : returning
-        ? '我在這裡'
-        : '我在哪';
+function setLocateButton() {
+  if (!locateBtn || !locateLabel) return;
+  locateBtn.classList.remove('is-loading','is-active');
+  locateBtn.disabled = false;
+  locateBtn.removeAttribute('aria-pressed');
+  locateLabel.textContent = '捷運';
 }
 
 function centeredMapUrl(lat, lng) {
@@ -624,6 +639,7 @@ function refreshAiHeaderTitle() {
 }
 
 function openAiPanel() {
+  closeMrtPanel();
   closeRadialMenu();
   refreshAiHeaderTitle();
   aiPanel.classList.add('is-visible');
@@ -1767,10 +1783,9 @@ sideBtn.addEventListener('click', () => {
 });
 closeBtn.addEventListener('click', closeOverlay);
 languageBtn.addEventListener('click', showLanguagePage);
-locateBtn.addEventListener('click', () => {
-  closeRadialMenu();
-  startLocationPeek();
-});
+locateBtn.addEventListener('click', openMrtPanel);
+mrtCloseBtn.addEventListener('click', closeMrtPanel);
+mrtBackdrop.addEventListener('click', closeMrtPanel);
 aiBtn.addEventListener('click', () => {
   closeRadialMenu();
   openAiPanel();
@@ -1804,6 +1819,10 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (merchantLinksSheet && merchantLinksSheet.classList.contains('is-visible')) {
     closeMerchantLinksSheet();
+    return;
+  }
+  if (mrtPanel && mrtPanel.classList.contains('is-visible')) {
+    closeMrtPanel();
     return;
   }
   if (radialMenu && radialMenu.classList.contains('is-open')) {

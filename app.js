@@ -1842,3 +1842,6 @@ shareBtn.addEventListener('click', async () => {
     }
   } catch (_) {}
 });
+
+
+import('./mrt_assistant.js?v=46').catch(() => {});

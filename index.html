@@ -31,14 +31,16 @@
         <div id="locationPeekLayer" class="location-peek-layer" aria-hidden="true">
           <iframe id="locationPeekFrame" class="location-peek-frame" title="Current location map" src="" loading="eager"></iframe>
           <div id="locationBeacon" class="location-beacon" aria-hidden="true">
-            <span class="location-beacon-pulse"></span>
-            <span class="location-beacon-dot"></span>
+            <span class="location-beacon-pulse" aria-hidden="true"></span>
+            <span class="location-beacon-ring location-beacon-ring-a" aria-hidden="true"></span>
+            <span class="location-beacon-ring location-beacon-ring-b" aria-hidden="true"></span>
+            <span class="location-beacon-dot" aria-hidden="true"></span>
           </div>
         </div>
 
         <button id="locateBtn" class="locate-btn" type="button" aria-label="我的位置 / Locate Me" aria-pressed="false">
           <span class="locate-icon" aria-hidden="true">◎</span>
-          <span id="locateLabel">我在哪 / Where am I</span>
+          <span id="locateLabel">我在哪</span>
         </button>
         <div id="locationStatus" class="location-status" role="status" aria-live="polite"></div>
 

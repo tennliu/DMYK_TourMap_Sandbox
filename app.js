@@ -213,13 +213,13 @@ const MERCHANT_FOCUS_BEACON_MS = 2550;
 const AI_COPY = {
   zh: {
     button:'問咚咚', placeholder:'想找什麼？', send:'送出',
-    welcome:'嗨，我是咚咚。現在是 Sandbox 沙盤模式，可以直接推演咖啡、甜點推薦與完整店家卡流程。',
+    welcome:'嗨，我是咚咚。現在是 Sandbox 沙盤模式，可以從東門永康商圈全類別店家中幫你找地方、比較選擇與查看店家卡。',
     quick:['推薦咖啡','買伴手禮','找眼鏡'],
     map:'在地圖上查看', navigate:'導航', call:'打電話', back:'← 返回推薦',
     hours:'營業時間', phone:'電話', waiting:'咚咚正在想…',
     error:'目前無法取得回覆，請稍後再試。', limit:'今天的測試次數已達上限。',
     showing:'已在地圖上顯示', photoPending:'Mock Photo',
-    dataNote:'Sandbox：店家資料由 261007_A 店家表單衍生；正式資料源仍以店家表單／後續 Google Sheet 為準。',
+    dataNote:'Sandbox：店家資料由 261007_C 店家表單衍生；正式資料源仍以店家表單／後續 Google Sheet 為準。',
     prototype:'Sandbox Mock · $0 API', navigateShop:'導航至店家', returnDongDong:'回到咚咚'
   },
   en: {
@@ -230,7 +230,7 @@ const AI_COPY = {
     hours:'Hours', phone:'Phone', waiting:'DongDong is thinking…',
     error:'Unable to answer right now. Please try again.', limit:'Today’s prototype request limit has been reached.',
     showing:'Showing on map', photoPending:'Mock Photo',
-    dataNote:'Sandbox merchant data is derived from the 261007_A workbook; the workbook / future Google Sheet remains canonical.',
+    dataNote:'Sandbox merchant data is derived from the 261007_C workbook; the workbook / future Google Sheet remains canonical.',
     prototype:'Sandbox Mock · $0 API', navigateShop:'Navigate to shop', returnDongDong:'Return to Dong-Dong'
   },
   ja: {
@@ -1424,7 +1424,7 @@ function rankSimilarMerchants(anchor) {
   const anchorCategory = String(anchor.cc || anchor.category_code || anchor.cat || anchor.category || '').toLowerCase();
   const anchorId = anchor.id || anchor.merchant_id;
 
-  return MERCHANT_CATALOG
+  const candidates = MERCHANT_CATALOG
     .filter(merchant => (merchant.id || merchant.merchant_id) !== anchorId)
     .map((merchant, index) => {
       const tags = merchantSemanticTags(merchant);
@@ -1437,9 +1437,9 @@ function rankSimilarMerchants(anchor) {
       return {merchant, index, score};
     })
     .filter(item => item.score > 0)
-    .map(item => ({...item, fairScore:item.score + Math.random() * 6}))
-    .sort((a,b) => b.fairScore - a.fairScore || b.score - a.score || a.index - b.index)
-    .map(item => item.merchant);
+    .sort((a,b) => b.score - a.score || a.index - b.index);
+
+  return fairRandomizeCandidates(candidates);
 }
 
 function mockAnswer(question) {

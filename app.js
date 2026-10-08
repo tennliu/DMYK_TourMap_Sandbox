@@ -193,6 +193,7 @@ let aiHistory = [];
 let aiSending = false;
 let aiTouchSendPending = false;
 let aiInitialized = false;
+let recommendationSequence = 0;
 let selectedMerchant = null;
 let merchantPhotoIndex = 0;
 let lastUserPosition = null;
@@ -293,37 +294,44 @@ const MOCK_COPY = {
   zh:{
     capability:'我目前可以從東門永康商圈 A–J 全類別店家中，依店名、類別與 ai_tags 模擬推薦，再開啟店家卡、地圖定位、導航與電話。',
     unsupported:'我還無法理解這個需求。可以試著描述想吃的料理、想買的商品或需要的服務，例如「牛肉麵」、「伴手禮」、「剪頭髮」或「眼鏡」。',
-    found:count=>`我先找到 ${count} 個適合的選擇。點其中一家可以查看完整店家卡。`
+    found:count=>`我先找到 ${count} 個適合的選擇。點其中一家可以查看完整店家卡。`,
+    exactFound:'找到這家店。', more:'看更多', similar:'看看類似的', similarFound:count=>`再看看 ${count} 個相似選擇。`, officialLinks:'官方連結'
   },
   en:{
     capability:'I can now search all A–J merchant categories in the Dongmen YongKang sandbox using names, categories, and semantic tags, then open merchant cards, map focus, navigation, and calling.',
     unsupported:'I could not match that request yet. Try describing a food, product, or service such as “beef noodles”, “souvenir”, “haircut”, or “glasses”.',
-    found:count=>`I found ${count} suitable options. Tap one to open its full merchant card.`
+    found:count=>`I found ${count} suitable options. Tap one to open its full merchant card.`,
+    exactFound:'I found this place.', more:'See more', similar:'Similar places', similarFound:count=>`Here are ${count} similar options.`, officialLinks:'Official links'
   },
   ja:{
     capability:'Sandboxデータを使って店舗のおすすめを模擬できます。おすすめをタップすると店舗カードを開き、地図表示、ナビ、電話、比較への戻りを試せます。',
     unsupported:'まだこの要望を判断できません。料理、商品、サービスをもう少し具体的に入力してください。',
-    found:count=>`${count}件の候補が見つかりました。店舗をタップすると詳しい店舗カードを確認できます。`
+    found:count=>`${count}件の候補が見つかりました。店舗をタップすると詳しい店舗カードを確認できます。`,
+    exactFound:'このお店が見つかりました。', more:'もっと見る', similar:'似たお店', similarFound:count=>`似た候補を${count}件表示します。`, officialLinks:'公式リンク'
   },
   ko:{
     capability:'Sandbox 데이터로 매장 추천을 모의할 수 있습니다. 추천 매장을 누르면 매장 카드, 지도 보기, 길찾기, 전화, 비교 화면 복귀를 테스트할 수 있습니다.',
     unsupported:'아직 이 요청을 정확히 이해하지 못했습니다. 음식, 상품 또는 서비스를 조금 더 구체적으로 입력해 주세요.',
-    found:count=>`적합한 선택지 ${count}곳을 찾았습니다. 매장을 누르면 전체 매장 카드를 볼 수 있습니다.`
+    found:count=>`적합한 선택지 ${count}곳을 찾았습니다. 매장을 누르면 전체 매장 카드를 볼 수 있습니다.`,
+    exactFound:'이 매장을 찾았습니다.', more:'더 보기', similar:'비슷한 곳', similarFound:count=>`비슷한 선택지 ${count}곳입니다.`, officialLinks:'공식 링크'
   },
   th:{
     capability:'ฉันสามารถจำลองการแนะนำร้านด้วยข้อมูล Sandbox ได้ แตะร้านที่แนะนำเพื่อทดลองการ์ดร้านค้า การดูแผนที่ การนำทาง การโทร และการกลับมาเปรียบเทียบ',
     unsupported:'ยังจับคู่คำขอนี้ไม่ได้ ลองระบุอาหาร สินค้า หรือบริการที่ต้องการให้ชัดเจนขึ้น',
-    found:count=>`พบตัวเลือกที่เหมาะสม ${count} แห่ง แตะร้านเพื่อดูการ์ดร้านค้าแบบเต็ม`
+    found:count=>`พบตัวเลือกที่เหมาะสม ${count} แห่ง แตะร้านเพื่อดูการ์ดร้านค้าแบบเต็ม`,
+    exactFound:'พบสถานที่นี้แล้ว', more:'ดูเพิ่มเติม', similar:'สถานที่คล้ายกัน', similarFound:count=>`พบตัวเลือกที่คล้ายกัน ${count} แห่ง`, officialLinks:'ลิงก์ทางการ'
   },
   vi:{
     capability:'Tôi có thể mô phỏng gợi ý cửa hàng bằng dữ liệu Sandbox. Hãy chạm vào một gợi ý để thử thẻ cửa hàng, xem bản đồ, chỉ đường, gọi điện và quay lại so sánh.',
     unsupported:'Tôi chưa thể khớp yêu cầu này. Hãy mô tả cụ thể hơn món ăn, sản phẩm hoặc dịch vụ bạn cần.',
-    found:count=>`Tôi tìm thấy ${count} lựa chọn phù hợp. Chạm vào một cửa hàng để xem thẻ đầy đủ.`
+    found:count=>`Tôi tìm thấy ${count} lựa chọn phù hợp. Chạm vào một cửa hàng để xem thẻ đầy đủ.`,
+    exactFound:'Tôi đã tìm thấy địa điểm này.', more:'Xem thêm', similar:'Địa điểm tương tự', similarFound:count=>`Có ${count} lựa chọn tương tự.`, officialLinks:'Liên kết chính thức'
   },
   id:{
     capability:'Saya dapat menyimulasikan rekomendasi toko dengan data Sandbox. Ketuk rekomendasi untuk mencoba kartu toko, tampilan peta, navigasi, telepon, dan kembali membandingkan.',
     unsupported:'Saya belum dapat mencocokkan permintaan ini. Coba jelaskan makanan, produk, atau layanan yang Anda cari dengan lebih spesifik.',
-    found:count=>`Saya menemukan ${count} pilihan yang sesuai. Ketuk salah satu toko untuk membuka kartu lengkap.`
+    found:count=>`Saya menemukan ${count} pilihan yang sesuai. Ketuk salah satu toko untuk membuka kartu lengkap.`,
+    exactFound:'Saya menemukan tempat ini.', more:'Lihat lainnya', similar:'Tempat serupa', similarFound:count=>`Berikut ${count} pilihan serupa.`, officialLinks:'Tautan resmi'
   }
 };
 
@@ -415,12 +423,12 @@ function setLocateButton(mode = 'idle') {
   locateBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
 
   locateLabel.textContent = loading
-    ? '定位中 / Locating…'
+    ? '定位中'
     : active
-      ? '我在這裡 / You are here'
+      ? '我在這裡'
       : returning
-        ? '我在這裡 / You are here'
-        : '我在哪 / Where am I';
+        ? '我在這裡'
+        : '我在哪';
 }
 
 function centeredMapUrl(lat, lng) {
@@ -482,6 +490,11 @@ function revealLocationPeek(position, token) {
 
   requestAnimationFrame(() => {
     if (token !== locationPeekToken) return;
+    locationBeacon.querySelectorAll('.location-beacon-ring').forEach(ring => {
+      ring.style.animation = 'none';
+      void ring.offsetWidth;
+      ring.style.animation = '';
+    });
     locationBeacon.classList.add('is-visible');
   });
 
@@ -834,6 +847,43 @@ function renderMerchantDetail(card) {
     body.appendChild(address);
   }
 
+  const officialLinkDefs = [
+    ['website','Website'],
+    ['instagram','Instagram'],
+    ['facebook','Facebook'],
+    ['line','LINE'],
+    ['tiktok','TikTok'],
+    ['threads','Threads'],
+    ['youtube','YouTube']
+  ];
+  const officialLinks = officialLinkDefs
+    .map(([key,label]) => ({key,label,url:String(card[key] || '').trim()}))
+    .filter(item => /^https?:\/\//i.test(item.url));
+
+  if (officialLinks.length) {
+    const linksSection = document.createElement('div');
+    linksSection.className = 'ai-official-links';
+
+    const linksLabel = document.createElement('div');
+    linksLabel.className = 'ai-official-links-label';
+    linksLabel.textContent = t.officialLinks || 'Official links';
+    linksSection.appendChild(linksLabel);
+
+    const linksGrid = document.createElement('div');
+    linksGrid.className = 'ai-official-links-grid';
+    officialLinks.forEach(item => {
+      const link = document.createElement('a');
+      link.className = 'ai-official-link';
+      link.href = item.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = item.label;
+      linksGrid.appendChild(link);
+    });
+    linksSection.appendChild(linksGrid);
+    body.appendChild(linksSection);
+  }
+
   const actions = document.createElement('div');
   actions.className = 'ai-merchant-actions';
 
@@ -873,45 +923,116 @@ function renderMerchantDetail(card) {
   updateMerchantHero(card, photos);
 }
 
-function addAiMessage(role, text, cards = []) {
+function renderRecommendationCards(bubble, cards) {
+  const oldList = bubble.querySelector('.ai-card-list');
+  if (oldList) oldList.remove();
+
+  if (!Array.isArray(cards) || !cards.length) return;
+
+  const list = document.createElement('div');
+  list.className = 'ai-card-list';
+  cards.forEach(card => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'ai-card';
+    item.addEventListener('click', () => openMerchantCard(card));
+
+    const name = document.createElement('div');
+    name.className = 'ai-card-name';
+    name.textContent = card.name || '';
+    item.appendChild(name);
+
+    if (card.subtitle) {
+      const subtitle = document.createElement('div');
+      subtitle.className = 'ai-card-subtitle';
+      subtitle.textContent = card.subtitle;
+      item.appendChild(subtitle);
+    }
+
+    if (card.category_label || card.category) {
+      const category = document.createElement('div');
+      category.className = 'ai-card-category';
+      category.textContent = card.category_label || card.category;
+      item.appendChild(category);
+    }
+
+    list.appendChild(item);
+  });
+  bubble.appendChild(list);
+}
+
+function nextRecommendationBatch(state) {
+  const size = state.batchSize || 3;
+  const start = state.cursor || 0;
+  const batch = state.pool.slice(start, start + size);
+  state.cursor = start + batch.length;
+  return batch;
+}
+
+function renderRecommendationControls(bubble, state) {
+  const oldActions = bubble.querySelector('.ai-result-actions');
+  if (oldActions) oldActions.remove();
+  if (!state) return;
+
+  const copy = MOCK_COPY[conversationLang] || MOCK_COPY.en;
+  const actions = document.createElement('div');
+  actions.className = 'ai-result-actions';
+
+  if (state.mode === 'exact' && state.anchorMerchant) {
+    const similarPool = rankSimilarMerchants(state.anchorMerchant);
+    if (similarPool.length) {
+      const similarBtn = document.createElement('button');
+      similarBtn.type = 'button';
+      similarBtn.className = 'ai-result-action';
+      similarBtn.textContent = copy.similar || 'Similar';
+      similarBtn.addEventListener('click', () => {
+        state.mode = 'similar';
+        state.pool = similarPool;
+        state.cursor = 0;
+        state.anchorMerchant = null;
+        const batch = nextRecommendationBatch(state);
+        const textNode = bubble.querySelector('.ai-message-text');
+        if (textNode) textNode.textContent = copy.similarFound ? copy.similarFound(batch.length) : copy.found(batch.length);
+        renderRecommendationCards(bubble, batch.map(merchantToCard));
+        renderRecommendationControls(bubble, state);
+      });
+      actions.appendChild(similarBtn);
+    }
+  }
+
+  if (state.mode !== 'exact' && state.cursor < state.pool.length) {
+    const moreBtn = document.createElement('button');
+    moreBtn.type = 'button';
+    moreBtn.className = 'ai-result-action';
+    moreBtn.textContent = copy.more || 'See more';
+    moreBtn.addEventListener('click', () => {
+      const batch = nextRecommendationBatch(state);
+      const textNode = bubble.querySelector('.ai-message-text');
+      if (textNode) textNode.textContent = copy.found(batch.length);
+      renderRecommendationCards(bubble, batch.map(merchantToCard));
+      renderRecommendationControls(bubble, state);
+    });
+    actions.appendChild(moreBtn);
+  }
+
+  if (actions.childElementCount) bubble.appendChild(actions);
+}
+
+function addAiMessage(role, text, cards = [], options = {}) {
   const row = document.createElement('div');
   row.className = `ai-message ${role}`;
   const bubble = document.createElement('div');
   bubble.className = 'ai-bubble';
-  bubble.textContent = text;
+
+  const textNode = document.createElement('div');
+  textNode.className = 'ai-message-text';
+  textNode.textContent = text;
+  bubble.appendChild(textNode);
   row.appendChild(bubble);
 
   if (role === 'assistant' && Array.isArray(cards) && cards.length) {
-    const list = document.createElement('div');
-    list.className = 'ai-card-list';
-    cards.forEach(card => {
-      const item = document.createElement('button');
-      item.type = 'button';
-      item.className = 'ai-card';
-      item.addEventListener('click', () => openMerchantCard(card));
-
-      const name = document.createElement('div');
-      name.className = 'ai-card-name';
-      name.textContent = card.name || '';
-      item.appendChild(name);
-
-      if (card.subtitle) {
-        const subtitle = document.createElement('div');
-        subtitle.className = 'ai-card-subtitle';
-        subtitle.textContent = card.subtitle;
-        item.appendChild(subtitle);
-      }
-
-      if (card.category_label || card.category) {
-        const category = document.createElement('div');
-        category.className = 'ai-card-category';
-        category.textContent = card.category_label || card.category;
-        item.appendChild(category);
-      }
-
-      list.appendChild(item);
-    });
-    bubble.appendChild(list);
+    renderRecommendationCards(bubble, cards);
+    renderRecommendationControls(bubble, options.recommendationState || null);
   }
 
   aiMessages.appendChild(row);
@@ -1117,7 +1238,14 @@ function merchantToCard(merchant) {
     photo_files:Array.isArray(merchant.photo_files) ? merchant.photo_files : [],
     photo_part:merchant.photo_part || null,
     drive_photo_ids:Array.isArray(merchant.drive_photo_ids) ? merchant.drive_photo_ids : [],
-    ai_tags:Array.isArray(merchant.ai_tags) ? merchant.ai_tags : []
+    ai_tags:Array.isArray(merchant.ai_tags) ? merchant.ai_tags : [],
+    website:merchant.website || '',
+    instagram:merchant.instagram || '',
+    facebook:merchant.facebook || '',
+    line:merchant.line || '',
+    tiktok:merchant.tiktok || '',
+    threads:merchant.threads || '',
+    youtube:merchant.youtube || ''
   };
 }
 
@@ -1225,17 +1353,80 @@ function semanticScore(merchant, q) {
   return score;
 }
 
-function rankMerchantsForQuery(catalog, q) {
-  const hasKnownIntent = SEMANTIC_INTENTS.some(intent => {
+function hasKnownSemanticIntent(q) {
+  return SEMANTIC_INTENTS.some(intent => {
     intent.query.lastIndex = 0;
     return intent.query.test(q);
   });
-  const minimumScore = hasKnownIntent ? 6 : 3;
+}
 
+function rankMerchantCandidates(catalog, q) {
+  const minimumScore = hasKnownSemanticIntent(q) ? 6 : 3;
   return catalog
     .map((merchant, index) => ({merchant, index, score:semanticScore(merchant, q)}))
     .filter(item => item.score >= minimumScore)
-    .sort((a,b) => b.score - a.score || a.index - b.index)
+    .sort((a,b) => b.score - a.score || a.index - b.index);
+}
+
+function fairRandomizeCandidates(items) {
+  return items
+    .map(item => ({...item, fairScore:item.score + Math.random() * 6}))
+    .sort((a,b) => b.fairScore - a.fairScore || b.score - a.score || a.index - b.index)
+    .map(item => item.merchant);
+}
+
+function normalizeMerchantName(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[\s·．・()（）\-_]/g,'');
+}
+
+function findSpecificMerchantMatches(catalog, q) {
+  const normalizedQ = normalizeMerchantName(q);
+  if (!normalizedQ) return [];
+
+  const fullMatches = catalog.filter(merchant => {
+    const zh = normalizeMerchantName(merchant.zh || merchant.name_zh);
+    const en = normalizeMerchantName(merchant.en || merchant.name_en);
+    return (zh.length >= 3 && normalizedQ.includes(zh)) ||
+           (en.length >= 3 && normalizedQ.includes(en));
+  });
+  if (fullMatches.length) return uniqueMerchants(fullMatches);
+
+  if (hasKnownSemanticIntent(q) || normalizedQ.length < 3) return [];
+
+  const partialMatches = catalog.filter(merchant => {
+    const zh = normalizeMerchantName(merchant.zh || merchant.name_zh);
+    const en = normalizeMerchantName(merchant.en || merchant.name_en);
+    return (zh && zh.includes(normalizedQ)) || (en && en.includes(normalizedQ));
+  });
+
+  return partialMatches.length && partialMatches.length <= 5
+    ? uniqueMerchants(partialMatches)
+    : [];
+}
+
+function rankSimilarMerchants(anchor) {
+  if (!anchor) return [];
+  const anchorTags = new Set(merchantSemanticTags(anchor));
+  const anchorCategory = String(anchor.cc || anchor.category_code || anchor.cat || anchor.category || '').toLowerCase();
+  const anchorId = anchor.id || anchor.merchant_id;
+
+  return MERCHANT_CATALOG
+    .filter(merchant => (merchant.id || merchant.merchant_id) !== anchorId)
+    .map((merchant, index) => {
+      const tags = merchantSemanticTags(merchant);
+      let score = 0;
+      const category = String(merchant.cc || merchant.category_code || merchant.cat || merchant.category || '').toLowerCase();
+      if (anchorCategory && category === anchorCategory) score += 24;
+      for (const tag of tags) {
+        if (anchorTags.has(tag)) score += 12;
+      }
+      return {merchant, index, score};
+    })
+    .filter(item => item.score > 0)
+    .map(item => ({...item, fairScore:item.score + Math.random() * 6}))
+    .sort((a,b) => b.fairScore - a.fairScore || b.score - a.score || a.index - b.index)
     .map(item => item.merchant);
 }
 
@@ -1246,34 +1437,73 @@ function mockAnswer(question) {
 
   const capabilityPattern = /你可以做什麼|what can you do|可以做什麼|何ができる|무엇을 할 수|ทำอะไรได้บ้าง|bạn làm được gì|apa yang bisa kamu lakukan/;
   if (capabilityPattern.test(q)) {
-    return {answer:copy.capability, cards:[]};
+    return {answer:copy.capability, mode:'none', pool:[]};
   }
 
-  let matches = [];
-
-  // Exact merchant-name lookup remains highest priority.
-  if (q) {
-    matches = catalog.filter(merchant => {
-      const zh = String(merchant.zh || merchant.name_zh || '').toLowerCase();
-      const en = String(merchant.en || merchant.name_en || '').toLowerCase();
-      return (zh && q.includes(zh)) || (en && q.includes(en));
-    });
+  const specific = findSpecificMerchantMatches(catalog, q);
+  if (specific.length === 1) {
+    return {answer:copy.exactFound || copy.found(1), mode:'exact', pool:specific, anchorMerchant:specific[0]};
+  }
+  if (specific.length > 1) {
+    return {answer:copy.found(specific.length), mode:'ambiguous', pool:specific};
   }
 
-  if (!matches.length) {
-    matches = rankMerchantsForQuery(catalog, q);
+  const ranked = rankMerchantCandidates(catalog, q);
+  const pool = uniqueMerchants(fairRandomizeCandidates(ranked));
+
+  if (!pool.length) {
+    return {answer:copy.unsupported, mode:'none', pool:[]};
   }
 
-  matches = uniqueMerchants(matches).slice(0,3);
+  return {answer:copy.found(Math.min(3,pool.length)), mode:'recommendation', pool};
+}
 
-  if (!matches.length) {
-    return {answer:copy.unsupported, cards:[]};
+async function submitAiQuestion(rawQuestion) {
+  const question = String(rawQuestion || '').trim();
+  if (!question || aiSending) return;
+
+  addAiMessage('user', question);
+  aiInput.value = '';
+  aiSending = true;
+  aiInput.disabled = true;
+  aiSendBtn.disabled = true;
+  const loadingRow = addAiLoading();
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 650));
+    const data = mockAnswer(question);
+    loadingRow.remove();
+
+    if (Array.isArray(data.pool) && data.pool.length) {
+      const state = {
+        id:++recommendationSequence,
+        query:question,
+        mode:data.mode,
+        pool:data.pool,
+        cursor:0,
+        batchSize:3,
+        anchorMerchant:data.anchorMerchant || null
+      };
+      const batch = data.mode === 'exact'
+        ? (state.cursor = 1, state.pool.slice(0,1))
+        : nextRecommendationBatch(state);
+      addAiMessage('assistant', data.answer, batch.map(merchantToCard), {recommendationState:state});
+    } else {
+      addAiMessage('assistant', data.answer);
+    }
+
+    aiHistory.push({role:'user',content:question},{role:'assistant',content:data.answer});
+    aiHistory = aiHistory.slice(-8);
+    aiModeLabel.textContent = getAiCopy().prototype;
+  } catch (_) {
+    if (loadingRow.isConnected) loadingRow.remove();
+    addAiMessage('assistant', getAiCopy().error);
+  } finally {
+    aiSending = false;
+    aiInput.disabled = false;
+    aiSendBtn.disabled = false;
+    aiInput.focus();
   }
-
-  return {
-    answer:copy.found(matches.length),
-    cards:matches.map(merchantToCard)
-  };
 }
 
 async function submitAiQuestion(rawQuestion) {

@@ -40,16 +40,16 @@
 
         <div id="radialMenuBackdrop" class="radial-menu-backdrop" aria-hidden="true"></div>
         <nav id="radialMenu" class="radial-menu" aria-label="地圖功能">
-          <button id="locateBtn" class="radial-action radial-action-locate" type="button" aria-label="我在哪" aria-pressed="false">
-            <img src="assets/GO_LocateSelf.svg?v=43" alt="" aria-hidden="true">
-            <span id="locateLabel" class="radial-action-label">我在哪</span>
+          <button id="mrtBtn" class="radial-action radial-action-mrt" type="button" aria-label="捷運路網">
+            <img src="assets/GO_MRT.svg?v=45" alt="" aria-hidden="true">
+            <span id="mrtLabel" class="radial-action-label">捷運</span>
           </button>
           <button id="aiBtn" class="radial-action radial-action-dongdong" type="button" aria-label="AI問咚咚 / Ask AI DongDong">
             <img src="assets/GO_DongDong.svg?v=43" alt="" aria-hidden="true">
             <span id="aiBtnLabel" class="radial-action-label">AI問咚咚</span>
           </button>
           <button id="sideBtn" class="radial-action radial-action-about" type="button" aria-label="關於">
-            <img src="assets/GO_About.svg?v=43" alt="" aria-hidden="true">
+            <img src="assets/GO_About.svg?v=45" alt="" aria-hidden="true">
             <span class="radial-action-label">關於</span>
           </button>
           <button id="heroMenuBtn" class="radial-hero-btn" type="button" aria-label="開啟地圖功能" aria-expanded="false">
@@ -57,6 +57,20 @@
           </button>
         </nav>
         <div id="locationStatus" class="location-status" role="status" aria-live="polite"></div>
+
+        <div id="mrtBackdrop" class="mrt-backdrop" aria-hidden="true"></div>
+        <section id="mrtPanel" class="mrt-panel" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="mrtPanelTitle">
+          <header class="mrt-panel-header">
+            <div>
+              <div id="mrtPanelTitle" class="mrt-panel-title">台北捷運 Metro Taipei</div>
+              <div class="mrt-panel-subtitle">東門站已標示 · Dongmen highlighted</div>
+            </div>
+            <button id="mrtCloseBtn" class="mrt-close-btn" type="button" aria-label="關閉">×</button>
+          </header>
+          <div class="mrt-map-stage">
+            <object id="mrtMapObject" class="mrt-map-object" data="assets/MRT_Map.svg?v=45" type="image/svg+xml" aria-label="Taipei Metro route map"></object>
+          </div>
+        </section>
 
         <div id="aiBackdrop" class="ai-backdrop" aria-hidden="true"></div>
         <section id="aiPanel" class="ai-panel" aria-hidden="true" aria-label="咚咚 AI">

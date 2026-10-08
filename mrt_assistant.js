@@ -1,7 +1,18 @@
 (() => {
   const DATA = window.DMYK_MRT_DATA || {};
   const LINE_ORDER = ['BR','R','G','O','BL','Y'];
-  const LINE_CLASS = {BR:'cls-36',R:'cls-31',G:'cls-30',O:'cls-39',BL:'cls-25',Y:'cls-45'};
+  const LINE_CLASS = {
+    BR:['cls-36'], R:['cls-31'], G:['cls-30'],
+    O:['cls-39'], BL:['cls-25','cls-16'], Y:['cls-45']
+  };
+  const STATION_MARKER_CLASS = {
+    BR:'cls-36', R:'cls-31', G:'cls-30',
+    O:'cls-39', BL:'cls-16', Y:'cls-45'
+  };
+  const BACKGROUND_OPACITY = 0.025;
+  let stationLabelGroups = null;
+  let stationMarkerGroups = null;
+  let boundSvgDocument = null;
 
   const panel = document.getElementById('mrtPanel');
   const trigger = document.getElementById('mrtBtn');
@@ -130,19 +141,105 @@
     return `約 ${(meters / 1000).toFixed(1)} km`;
   }
 
+  function setupMrtSvgLayers(doc) {
+    if (!doc) return;
+    if (boundSvgDocument === doc && stationLabelGroups && stationMarkerGroups) return;
+    boundSvgDocument = doc;
+    stationLabelGroups = [];
+    stationMarkerGroups = [];
+
+    // The supplied Illustrator SVG outlines station labels into path groups.
+    // Identify each label group by its nearby color-coded station marker.
+    const svg = doc.querySelector('svg');
+    const mainGroup = svg && [...svg.querySelectorAll('g')]
+      .find(group => group.children.length > 450);
+    if (!mainGroup) return;
+
+    let sheet = doc.getElementById('dmyk-mrt-highlight-style');
+    if (!sheet) {
+      sheet = doc.createElementNS('http://www.w3.org/2000/svg','style');
+      sheet.id = 'dmyk-mrt-highlight-style';
+      sheet.textContent = [
+        '.dmyk-mrt-dim { opacity:.025!important; }',
+        '.dmyk-mrt-label,.dmyk-mrt-marker { transition:opacity .22s ease; }'
+      ].join('\n');
+      svg.appendChild(sheet);
+    }
+
+    const markers = [];
+    const labels = [];
+    for (const group of mainGroup.children) {
+      if (group.tagName.toLowerCase() !== 'g') continue;
+
+      const glyphs = group.querySelectorAll('.cls-32');
+      let markerLine = null;
+      for (const [line,cls] of Object.entries(STATION_MARKER_CLASS)) {
+        if (group.querySelector('.' + cls)) {
+          markerLine = line;
+          break;
+        }
+      }
+
+      let bbox;
+      try { bbox = group.getBBox(); } catch (_) { continue; }
+      if (!bbox.width || !bbox.height) continue;
+      const cx = bbox.x + bbox.width / 2;
+      const cy = bbox.y + bbox.height / 2;
+
+      if (markerLine && group.querySelector('.cls-9')) {
+        group.classList.add('dmyk-mrt-marker');
+        markers.push({element:group,line:markerLine,cx,cy});
+      }
+
+      if (glyphs.length) {
+        group.classList.add('dmyk-mrt-label');
+        labels.push({element:group,line:markerLine,cx,cy});
+      }
+    }
+
+    for (const label of labels) {
+      let line = label.line;
+      if (!line && markers.length) {
+        let best = null;
+        for (const marker of markers) {
+          const dist = Math.hypot(label.cx - marker.cx, label.cy - marker.cy);
+          if (!best || dist < best.dist) best = {line:marker.line,dist};
+        }
+        // Keep large legends and non-station captions readable.
+        if (best && best.dist < 75) line = best.line;
+      }
+      if (line) stationLabelGroups.push({element:label.element,line});
+    }
+    stationMarkerGroups = markers.map(({element,line}) => ({element,line}));
+  }
+
   function setMapHighlight(lines) {
     activeLines = Array.from(new Set(lines || []));
     const doc = mapObject.contentDocument;
     if (!doc) return;
-    const hasSelection = activeLines.length > 0;
-    Object.entries(LINE_CLASS).forEach(([line, cls]) => {
-      const isActive = activeLines.includes(line);
-      doc.querySelectorAll('.' + cls).forEach(el => {
-        el.style.transition = 'opacity .24s ease, filter .24s ease';
-        el.style.opacity = hasSelection ? (isActive ? '1' : '.14') : '1';
-        el.style.filter = isActive ? 'drop-shadow(0 0 1.3px rgba(255,255,255,.75))' : 'none';
-      });
+    setupMrtSvgLayers(doc);
+    const selected = new Set(activeLines);
+    const hasSelection = selected.size > 0;
+
+    // Colored route paths: nonselected lines almost disappear.
+    Object.entries(LINE_CLASS).forEach(([line,classes]) => {
+      for (const cls of classes) {
+        doc.querySelectorAll('.' + cls).forEach(el => {
+          el.style.transition = 'opacity .22s ease';
+          el.style.opacity = hasSelection && !selected.has(line)
+            ? String(BACKGROUND_OPACITY) : '1';
+        });
+      }
     });
+
+    // Dim the corresponding outlined station names AND station-code badges.
+    // Retain the names on both active lines when a transfer is needed.
+    for (const {element,line} of stationLabelGroups || []) {
+      element.classList.toggle('dmyk-mrt-dim',hasSelection && !selected.has(line));
+    }
+    for (const {element,line} of stationMarkerGroups || []) {
+      element.classList.toggle('dmyk-mrt-dim',hasSelection && !selected.has(line));
+    }
   }
 
   function renderLineChoices() {

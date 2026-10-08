@@ -120,6 +120,29 @@ const MERCHANT_CATALOG =
     ? window.DMYK_MERCHANTS
     : FALLBACK_MERCHANTS;
 
+async function syncMerchantPhotoManifest() {
+  try {
+    const response = await fetch('/api/photo-manifest', {
+      method:'GET',
+      headers:{'Accept':'application/json'},
+      cache:'default'
+    });
+    if (!response.ok) return;
+    const data = await response.json();
+    if (!data || !data.enabled || !data.manifest || typeof data.manifest !== 'object') return;
+
+    for (const merchant of MERCHANT_CATALOG) {
+      const ids = data.manifest[merchant.id];
+      if (!Array.isArray(ids)) continue;
+      merchant.drive_photo_ids = ids.filter(Boolean);
+    }
+  } catch (_) {
+    // Runtime photo sync is optional; baked manifest remains the fallback.
+  }
+}
+
+syncMerchantPhotoManifest();
+
 
 const languageScreen = document.getElementById('languageScreen');
 const mapScreen = document.getElementById('mapScreen');

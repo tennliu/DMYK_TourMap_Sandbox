@@ -1,3 +1,4 @@
+@import url("mrt_assistant.css?v=46");
 :root{--master:390px;--outer:#5f0008;--page-red:#910000}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;min-height:100%;background:var(--outer);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Noto Sans",Arial,sans-serif}

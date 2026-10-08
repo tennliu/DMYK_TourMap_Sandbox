@@ -318,43 +318,43 @@ const MOCK_COPY = {
     capability:'我目前可以從東門永康商圈 A–J 全類別店家中，依店名、類別與 ai_tags 模擬推薦，再開啟店家卡、地圖定位、導航與電話。',
     unsupported:'我還無法理解這個需求。可以試著描述想吃的料理、想買的商品或需要的服務，例如「牛肉麵」、「伴手禮」、「剪頭髮」或「眼鏡」。',
     found:count=>`我先找到 ${count} 個適合的選擇。點其中一家可以查看完整店家卡。`,
-    exactFound:'找到這家店。', more:'看更多', similar:'看看類似的', similarFound:count=>`再看看 ${count} 個相似選擇。`, officialLinks:'官方連結'
+    exactFound:'找到這家店。', more:'看更多', nearest:'離我最近', locatingNearest:'正在確認距離…', nearestFound:(name,distance)=>`符合這次搜尋、離你最近的是 ${name}，直線距離${distance}。`, nearestError:'目前無法取得你的位置。', similar:'看看類似的', similarFound:count=>`再看看 ${count} 個相似選擇。`, officialLinks:'官方連結'
   },
   en:{
     capability:'I can now search all A–J merchant categories in the Dongmen YongKang sandbox using names, categories, and semantic tags, then open merchant cards, map focus, navigation, and calling.',
     unsupported:'I could not match that request yet. Try describing a food, product, or service such as “beef noodles”, “souvenir”, “haircut”, or “glasses”.',
     found:count=>`I found ${count} suitable options. Tap one to open its full merchant card.`,
-    exactFound:'I found this place.', more:'See more', similar:'Similar places', similarFound:count=>`Here are ${count} similar options.`, officialLinks:'Official links'
+    exactFound:'I found this place.', more:'See more', nearest:'Nearest', locatingNearest:'Locating…', nearestFound:(name,distance)=>`The nearest matching result is ${name}, ${distance} away in a straight line.`, nearestError:'I can’t get your location right now.', similar:'Similar places', similarFound:count=>`Here are ${count} similar options.`, officialLinks:'Official links'
   },
   ja:{
     capability:'Sandboxデータを使って店舗のおすすめを模擬できます。おすすめをタップすると店舗カードを開き、地図表示、ナビ、電話、比較への戻りを試せます。',
     unsupported:'まだこの要望を判断できません。料理、商品、サービスをもう少し具体的に入力してください。',
     found:count=>`${count}件の候補が見つかりました。店舗をタップすると詳しい店舗カードを確認できます。`,
-    exactFound:'このお店が見つかりました。', more:'もっと見る', similar:'似たお店', similarFound:count=>`似た候補を${count}件表示します。`, officialLinks:'公式リンク'
+    exactFound:'このお店が見つかりました。', more:'もっと見る', nearest:'一番近い', locatingNearest:'現在地を確認中…', nearestFound:(name,distance)=>`条件に合う中で一番近いのは ${name}（直線距離 ${distance}）です。`, nearestError:'現在地を取得できません。', similar:'似たお店', similarFound:count=>`似た候補を${count}件表示します。`, officialLinks:'公式リンク'
   },
   ko:{
     capability:'Sandbox 데이터로 매장 추천을 모의할 수 있습니다. 추천 매장을 누르면 매장 카드, 지도 보기, 길찾기, 전화, 비교 화면 복귀를 테스트할 수 있습니다.',
     unsupported:'아직 이 요청을 정확히 이해하지 못했습니다. 음식, 상품 또는 서비스를 조금 더 구체적으로 입력해 주세요.',
     found:count=>`적합한 선택지 ${count}곳을 찾았습니다. 매장을 누르면 전체 매장 카드를 볼 수 있습니다.`,
-    exactFound:'이 매장을 찾았습니다.', more:'더 보기', similar:'비슷한 곳', similarFound:count=>`비슷한 선택지 ${count}곳입니다.`, officialLinks:'공식 링크'
+    exactFound:'이 매장을 찾았습니다.', more:'더 보기', nearest:'가장 가까운 곳', locatingNearest:'위치 확인 중…', nearestFound:(name,distance)=>`조건에 맞는 곳 중 가장 가까운 곳은 ${name}이며 직선거리 ${distance}입니다.`, nearestError:'현재 위치를 가져올 수 없습니다.', similar:'비슷한 곳', similarFound:count=>`비슷한 선택지 ${count}곳입니다.`, officialLinks:'공식 링크'
   },
   th:{
     capability:'ฉันสามารถจำลองการแนะนำร้านด้วยข้อมูล Sandbox ได้ แตะร้านที่แนะนำเพื่อทดลองการ์ดร้านค้า การดูแผนที่ การนำทาง การโทร และการกลับมาเปรียบเทียบ',
     unsupported:'ยังจับคู่คำขอนี้ไม่ได้ ลองระบุอาหาร สินค้า หรือบริการที่ต้องการให้ชัดเจนขึ้น',
     found:count=>`พบตัวเลือกที่เหมาะสม ${count} แห่ง แตะร้านเพื่อดูการ์ดร้านค้าแบบเต็ม`,
-    exactFound:'พบสถานที่นี้แล้ว', more:'ดูเพิ่มเติม', similar:'สถานที่คล้ายกัน', similarFound:count=>`พบตัวเลือกที่คล้ายกัน ${count} แห่ง`, officialLinks:'ลิงก์ทางการ'
+    exactFound:'พบสถานที่นี้แล้ว', more:'ดูเพิ่มเติม', nearest:'ใกล้ฉันที่สุด', locatingNearest:'กำลังตรวจสอบตำแหน่ง…', nearestFound:(name,distance)=>`ผลลัพธ์ที่ตรงเงื่อนไขและใกล้ที่สุดคือ ${name} ระยะเส้นตรง ${distance}`, nearestError:'ไม่สามารถรับตำแหน่งของคุณได้ในขณะนี้', similar:'สถานที่คล้ายกัน', similarFound:count=>`พบตัวเลือกที่คล้ายกัน ${count} แห่ง`, officialLinks:'ลิงก์ทางการ'
   },
   vi:{
     capability:'Tôi có thể mô phỏng gợi ý cửa hàng bằng dữ liệu Sandbox. Hãy chạm vào một gợi ý để thử thẻ cửa hàng, xem bản đồ, chỉ đường, gọi điện và quay lại so sánh.',
     unsupported:'Tôi chưa thể khớp yêu cầu này. Hãy mô tả cụ thể hơn món ăn, sản phẩm hoặc dịch vụ bạn cần.',
     found:count=>`Tôi tìm thấy ${count} lựa chọn phù hợp. Chạm vào một cửa hàng để xem thẻ đầy đủ.`,
-    exactFound:'Tôi đã tìm thấy địa điểm này.', more:'Xem thêm', similar:'Địa điểm tương tự', similarFound:count=>`Có ${count} lựa chọn tương tự.`, officialLinks:'Liên kết chính thức'
+    exactFound:'Tôi đã tìm thấy địa điểm này.', more:'Xem thêm', nearest:'Gần tôi nhất', locatingNearest:'Đang xác định vị trí…', nearestFound:(name,distance)=>`Kết quả phù hợp gần bạn nhất là ${name}, khoảng cách đường thẳng ${distance}.`, nearestError:'Hiện không thể lấy vị trí của bạn.', similar:'Địa điểm tương tự', similarFound:count=>`Có ${count} lựa chọn tương tự.`, officialLinks:'Liên kết chính thức'
   },
   id:{
     capability:'Saya dapat menyimulasikan rekomendasi toko dengan data Sandbox. Ketuk rekomendasi untuk mencoba kartu toko, tampilan peta, navigasi, telepon, dan kembali membandingkan.',
     unsupported:'Saya belum dapat mencocokkan permintaan ini. Coba jelaskan makanan, produk, atau layanan yang Anda cari dengan lebih spesifik.',
     found:count=>`Saya menemukan ${count} pilihan yang sesuai. Ketuk salah satu toko untuk membuka kartu lengkap.`,
-    exactFound:'Saya menemukan tempat ini.', more:'Lihat lainnya', similar:'Tempat serupa', similarFound:count=>`Berikut ${count} pilihan serupa.`, officialLinks:'Tautan resmi'
+    exactFound:'Saya menemukan tempat ini.', more:'Lihat lainnya', nearest:'Terdekat', locatingNearest:'Mencari lokasi…', nearestFound:(name,distance)=>`Hasil yang cocok dan paling dekat adalah ${name}, berjarak lurus ${distance}.`, nearestError:'Lokasi Anda tidak dapat diperoleh saat ini.', similar:'Tempat serupa', similarFound:count=>`Berikut ${count} pilihan serupa.`, officialLinks:'Tautan resmi'
   }
 };
 
@@ -1057,6 +1057,13 @@ function renderRecommendationCards(bubble, cards) {
       item.appendChild(category);
     }
 
+    if (card.distance_label) {
+      const distance = document.createElement('div');
+      distance.className = 'ai-card-distance';
+      distance.textContent = card.distance_label;
+      item.appendChild(distance);
+    }
+
     list.appendChild(item);
   });
   bubble.appendChild(list);
@@ -1068,6 +1075,40 @@ function nextRecommendationBatch(state) {
   const batch = state.pool.slice(start, start + size);
   state.cursor = start + batch.length;
   return batch;
+}
+
+function requestRecommendationPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('geolocation-unavailable'));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const {latitude:lat, longitude:lng} = position.coords;
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+          reject(new Error('invalid-position'));
+          return;
+        }
+        lastUserPosition = {lat, lng};
+        resolve(lastUserPosition);
+      },
+      reject,
+      {enableHighAccuracy:true, maximumAge:30000, timeout:10000}
+    );
+  });
+}
+
+function nearestMatchingResult(state, position) {
+  if (!state || !position || !Array.isArray(state.pool)) return null;
+  let nearest = null;
+  state.pool.forEach((merchant, index) => {
+    if (!Number.isFinite(merchant.lat) || !Number.isFinite(merchant.lng)) return;
+    const meters = distanceMeters(position.lat, position.lng, merchant.lat, merchant.lng);
+    if (!Number.isFinite(meters)) return;
+    if (!nearest || meters < nearest.meters) nearest = {merchant, meters, index};
+  });
+  return nearest;
 }
 
 function renderRecommendationControls(bubble, state) {
@@ -1114,6 +1155,47 @@ function renderRecommendationControls(bubble, state) {
       renderRecommendationControls(bubble, state);
     });
     actions.appendChild(moreBtn);
+  }
+
+  if (state.mode !== 'exact' && state.pool.some(merchant => Number.isFinite(merchant.lat) && Number.isFinite(merchant.lng))) {
+    const nearestBtn = document.createElement('button');
+    nearestBtn.type = 'button';
+    nearestBtn.className = 'ai-result-action ai-result-action-nearest';
+    nearestBtn.textContent = copy.nearest || 'Nearest';
+    nearestBtn.addEventListener('click', async () => {
+      nearestBtn.disabled = true;
+      nearestBtn.textContent = copy.locatingNearest || 'Locating…';
+      try {
+        const position = await requestRecommendationPosition();
+        const nearest = nearestMatchingResult(state, position);
+        if (!nearest) throw new Error('no-coordinate-match');
+
+        const card = merchantToCard(nearest.merchant);
+        const distanceLabel = formatMerchantDistance(nearest.meters);
+        card.distance_label = distanceLabel;
+
+        // If the nearest result has not appeared in pagination yet, remove it
+        // from the remaining pool so "See more" will not repeat it later.
+        if (nearest.index >= state.cursor) {
+          state.pool.splice(nearest.index, 1);
+        }
+
+        const textNode = bubble.querySelector('.ai-message-text');
+        if (textNode) {
+          textNode.textContent = copy.nearestFound
+            ? copy.nearestFound(card.name || '', distanceLabel)
+            : `${card.name || ''} · ${distanceLabel}`;
+        }
+        renderRecommendationCards(bubble, [card]);
+        renderRecommendationControls(bubble, state);
+      } catch (_) {
+        const textNode = bubble.querySelector('.ai-message-text');
+        if (textNode) textNode.textContent = copy.nearestError || 'Location unavailable.';
+        nearestBtn.disabled = false;
+        nearestBtn.textContent = copy.nearest || 'Nearest';
+      }
+    });
+    actions.appendChild(nearestBtn);
   }
 
   if (actions.childElementCount) bubble.appendChild(actions);

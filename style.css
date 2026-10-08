@@ -141,9 +141,8 @@ body{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .merchant-focus-action:active{transform:scale(.98)}
 .merchant-focus-action-primary{background:#910000;color:#fff}
 #merchantReturnBtn{background:rgba(255,255,255,.98);border-width:1.5px;font-size:13px;box-shadow:0 3px 12px rgba(0,0,0,.22)}
-.map-screen.is-merchant-focus .locate-btn,
-.map-screen.is-merchant-focus .ai-btn,
-.map-screen.is-merchant-focus .side-btn,
+.map-screen.is-merchant-focus .radial-menu,
+.map-screen.is-merchant-focus .radial-menu-backdrop,
 .map-screen.is-merchant-focus .location-status{opacity:0;visibility:hidden;pointer-events:none}
 
 
@@ -174,3 +173,35 @@ body.map-active .phone-shell{overflow:hidden}
 .ai-official-links-grid{display:flex;flex-wrap:wrap;gap:7px}
 .ai-official-link{display:inline-flex;align-items:center;justify-content:center;min-height:34px;border:1px solid #d9c1c1;border-radius:17px;padding:0 12px;background:#fff;color:#910000;font-size:11px;font-weight:800;text-decoration:none}
 .ai-official-link:active{background:#f7eeee;transform:scale(.98)}
+
+
+/* Radial hero menu */
+.radial-menu-backdrop{position:absolute;inset:0;z-index:13;background:transparent;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility 0s linear .18s}
+.radial-menu-backdrop.is-visible{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .18s ease}
+.radial-menu{position:absolute;z-index:15;left:0;right:0;bottom:max(22px,env(safe-area-inset-bottom));height:76px;pointer-events:none;transition:opacity .18s ease,visibility .18s ease}
+.radial-hero-btn{position:absolute;left:50%;bottom:0;width:72px;height:72px;border:0;padding:0;background:transparent;transform:translateX(-50%);cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 3px 10px rgba(0,0,0,.24));transition:transform .2s ease,filter .2s ease}
+.radial-hero-btn img{display:block;width:100%;height:100%;pointer-events:none;user-select:none}
+.radial-hero-btn:active{transform:translateX(-50%) scale(.94)}
+.radial-menu.is-open .radial-hero-btn{transform:translateX(-50%) scale(.96);filter:drop-shadow(0 4px 13px rgba(0,0,0,.28))}
+.radial-action{position:absolute;left:50%;bottom:-5px;width:82px;min-height:84px;border:0;padding:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;color:#2f2f2f;cursor:pointer;opacity:0;visibility:hidden;pointer-events:none;transform:translate(-50%,0) scale(.48);transform-origin:50% 70%;transition:transform .28s cubic-bezier(.22,.78,.22,1),opacity .2s ease,visibility 0s linear .28s;-webkit-tap-highlight-color:transparent}
+.radial-action img{display:block;width:58px;height:58px;filter:drop-shadow(0 3px 9px rgba(0,0,0,.2));pointer-events:none;user-select:none}
+.radial-action-label{display:inline-flex;align-items:center;justify-content:center;max-width:82px;min-height:20px;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.96);box-shadow:0 1px 5px rgba(0,0,0,.16);color:#333;font-size:10.5px;line-height:1.15;font-weight:800;white-space:nowrap;pointer-events:none}
+.radial-action:active img{transform:scale(.94)}
+.radial-action:disabled{opacity:.5;cursor:default}
+.radial-action.is-loading .radial-action-label{min-width:44px}
+.radial-menu.is-open .radial-action{opacity:1;visibility:visible;pointer-events:auto;transition:transform .28s cubic-bezier(.22,.78,.22,1),opacity .2s ease,visibility 0s}
+.radial-action-locate{--radial-x:-92px;--radial-y:-76px}
+.radial-action-dongdong{--radial-x:0px;--radial-y:-116px}
+.radial-action-about{--radial-x:92px;--radial-y:-76px}
+.radial-menu.is-open .radial-action{transform:translate(calc(-50% + var(--radial-x)),var(--radial-y)) scale(1)}
+.radial-menu.is-open .radial-action-locate{transition-delay:.02s}
+.radial-menu.is-open .radial-action-dongdong{transition-delay:.06s}
+.radial-menu.is-open .radial-action-about{transition-delay:.10s}
+@media(max-width:340px){
+  .radial-action-locate{--radial-x:-82px;--radial-y:-74px}
+  .radial-action-about{--radial-x:82px;--radial-y:-74px}
+  .radial-action-dongdong{--radial-y:-112px}
+  .radial-action{width:76px}
+  .radial-action img{width:54px;height:54px}
+  .radial-action-label{max-width:76px;font-size:10px}
+}

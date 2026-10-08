@@ -175,6 +175,12 @@ const aiInput = document.getElementById('aiInput');
 const aiSendBtn = document.getElementById('aiSendBtn');
 const aiModeLabel = document.getElementById('aiModeLabel');
 const aiPanelTitle = document.getElementById('aiPanelTitle');
+const merchantLinksBackdrop = document.getElementById('merchantLinksBackdrop');
+const merchantLinksSheet = document.getElementById('merchantLinksSheet');
+const merchantLinksTitle = document.getElementById('merchantLinksTitle');
+const merchantLinksSubtitle = document.getElementById('merchantLinksSubtitle');
+const merchantLinksList = document.getElementById('merchantLinksList');
+const merchantLinksCloseBtn = document.getElementById('merchantLinksCloseBtn');
 const merchantFocusLayer = document.getElementById('merchantFocusLayer');
 const merchantFocusBeacon = document.getElementById('merchantFocusBeacon');
 const merchantFocusName = document.getElementById('merchantFocusName');
@@ -215,7 +221,7 @@ const MERCHANT_FOCUS_BEACON_MS = 2550;
 
 const AI_COPY = {
   zh: {
-    button:'問咚咚', placeholder:'想找什麼？', send:'送出',
+    button:'AI問咚咚', placeholder:'想找什麼？', send:'送出',
     welcome:'嗨，我是咚咚。現在是 Sandbox 沙盤模式，可以從東門永康商圈全類別店家中幫你找地方、比較選擇與查看店家卡。',
     quick:['推薦咖啡','買伴手禮','找眼鏡'],
     map:'在地圖上查看', navigate:'導航', call:'打電話', back:'← 返回推薦',
@@ -292,6 +298,20 @@ const AI_COPY = {
     prototype:'Sandbox Mock · $0 API', navigateShop:'Navigasi ke toko', returnDongDong:'Kembali ke 咚咚'
   }
 };
+
+const MERCHANT_LINK_COPY = {
+  zh:{row:'社群網站',open:'查看',title:'官方網站與社群',close:'關閉'},
+  en:{row:'Web & social',open:'View',title:'Official website & social',close:'Close'},
+  ja:{row:'公式サイト・SNS',open:'表示',title:'公式サイト・SNS',close:'閉じる'},
+  ko:{row:'웹・소셜',open:'보기',title:'공식 웹사이트・소셜',close:'닫기'},
+  th:{row:'เว็บไซต์・โซเชียล',open:'ดู',title:'เว็บไซต์และโซเชียลอย่างเป็นทางการ',close:'ปิด'},
+  vi:{row:'Web・mạng xã hội',open:'Xem',title:'Website & mạng xã hội chính thức',close:'Đóng'},
+  id:{row:'Web・sosial',open:'Lihat',title:'Situs & sosial resmi',close:'Tutup'}
+};
+
+function getMerchantLinkCopy() {
+  return MERCHANT_LINK_COPY[conversationLang] || MERCHANT_LINK_COPY.en;
+}
 
 const MOCK_COPY = {
   zh:{
@@ -623,6 +643,7 @@ function openAiPanel() {
 }
 
 function closeAiPanel() {
+  closeMerchantLinksSheet();
   aiPanel.classList.remove('is-visible');
   aiBackdrop.classList.remove('is-visible');
   aiPanel.setAttribute('aria-hidden','true');
@@ -706,6 +727,7 @@ function updateMerchantHero(card, photos) {
 }
 
 function openMerchantCard(card) {
+  closeMerchantLinksSheet();
   selectedMerchant = card;
   merchantPhotoIndex = 0;
   renderMerchantDetail(card);
@@ -715,6 +737,7 @@ function openMerchantCard(card) {
 }
 
 function backToSuggestions() {
+  closeMerchantLinksSheet();
   selectedMerchant = null;
   merchantPhotoIndex = 0;
   showConversationView();
@@ -745,6 +768,69 @@ function navigateToMerchant(card) {
 function callMerchant(card) {
   if (!card.phone) return;
   window.location.href = `tel:${String(card.phone).replace(/[^+\d]/g,'')}`;
+}
+
+function getOfficialMerchantLinks(card) {
+  const defs = [
+    ['website','Website'],
+    ['instagram','Instagram'],
+    ['facebook','Facebook'],
+    ['line','LINE'],
+    ['tiktok','TikTok'],
+    ['threads','Threads'],
+    ['youtube','YouTube']
+  ];
+  return defs
+    .map(([key,label]) => ({key,label,url:String(card?.[key] || '').trim()}))
+    .filter(item => /^https?:\/\//i.test(item.url));
+}
+
+function closeMerchantLinksSheet() {
+  if (!merchantLinksSheet || !merchantLinksBackdrop) return;
+  merchantLinksSheet.classList.remove('is-visible');
+  merchantLinksBackdrop.classList.remove('is-visible');
+  merchantLinksSheet.setAttribute('aria-hidden','true');
+  merchantLinksBackdrop.setAttribute('aria-hidden','true');
+}
+
+function openMerchantLinksSheet(card) {
+  const links = getOfficialMerchantLinks(card);
+  if (!links.length || !merchantLinksSheet || !merchantLinksBackdrop || !merchantLinksList) return;
+
+  const copy = getMerchantLinkCopy();
+  merchantLinksTitle.textContent = copy.title;
+  merchantLinksSubtitle.textContent = card.name || '';
+  merchantLinksCloseBtn.setAttribute('aria-label', copy.close);
+  merchantLinksList.innerHTML = '';
+
+  links.forEach(item => {
+    const link = document.createElement('a');
+    link.className = 'merchant-links-item';
+    link.href = item.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+
+    const label = document.createElement('span');
+    label.className = 'merchant-links-item-label';
+    label.textContent = item.label;
+    link.appendChild(label);
+
+    const arrow = document.createElement('span');
+    arrow.className = 'merchant-links-item-arrow';
+    arrow.setAttribute('aria-hidden','true');
+    arrow.textContent = '↗';
+    link.appendChild(arrow);
+
+    link.addEventListener('click', () => {
+      setTimeout(closeMerchantLinksSheet, 120);
+    });
+    merchantLinksList.appendChild(link);
+  });
+
+  merchantLinksBackdrop.classList.add('is-visible');
+  merchantLinksSheet.classList.add('is-visible');
+  merchantLinksBackdrop.setAttribute('aria-hidden','false');
+  merchantLinksSheet.setAttribute('aria-hidden','false');
 }
 
 function renderMerchantDetail(card) {
@@ -863,6 +949,31 @@ function renderMerchantDetail(card) {
   phoneRow.children[1].textContent = card.phone_display || card.phone || '—';
   meta.appendChild(phoneRow);
 
+  const officialLinks = getOfficialMerchantLinks(card);
+  if (officialLinks.length) {
+    const socialCopy = getMerchantLinkCopy();
+    const socialRow = document.createElement('div');
+    socialRow.className = 'ai-merchant-meta-row ai-merchant-social-row';
+
+    const socialLabel = document.createElement('div');
+    socialLabel.className = 'ai-merchant-meta-label';
+    socialLabel.textContent = socialCopy.row;
+    socialRow.appendChild(socialLabel);
+
+    const socialValue = document.createElement('div');
+    socialValue.className = 'ai-merchant-meta-value';
+
+    const socialButton = document.createElement('button');
+    socialButton.type = 'button';
+    socialButton.className = 'ai-merchant-social-trigger';
+    socialButton.textContent = socialCopy.open + ' ›';
+    socialButton.addEventListener('click', () => openMerchantLinksSheet(card));
+    socialValue.appendChild(socialButton);
+
+    socialRow.appendChild(socialValue);
+    meta.appendChild(socialRow);
+  }
+
   body.appendChild(meta);
 
   if (card.subtitle) {
@@ -872,42 +983,7 @@ function renderMerchantDetail(card) {
     body.appendChild(address);
   }
 
-  const officialLinkDefs = [
-    ['website','Website'],
-    ['instagram','Instagram'],
-    ['facebook','Facebook'],
-    ['line','LINE'],
-    ['tiktok','TikTok'],
-    ['threads','Threads'],
-    ['youtube','YouTube']
-  ];
-  const officialLinks = officialLinkDefs
-    .map(([key,label]) => ({key,label,url:String(card[key] || '').trim()}))
-    .filter(item => /^https?:\/\//i.test(item.url));
 
-  if (officialLinks.length) {
-    const linksSection = document.createElement('div');
-    linksSection.className = 'ai-official-links';
-
-    const linksLabel = document.createElement('div');
-    linksLabel.className = 'ai-official-links-label';
-    linksLabel.textContent = t.officialLinks || 'Official links';
-    linksSection.appendChild(linksLabel);
-
-    const linksGrid = document.createElement('div');
-    linksGrid.className = 'ai-official-links-grid';
-    officialLinks.forEach(item => {
-      const link = document.createElement('a');
-      link.className = 'ai-official-link';
-      link.href = item.url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.textContent = item.label;
-      linksGrid.appendChild(link);
-    });
-    linksSection.appendChild(linksGrid);
-    body.appendChild(linksSection);
-  }
 
   const actions = document.createElement('div');
   actions.className = 'ai-merchant-actions';
@@ -1623,6 +1699,8 @@ merchantNavigateBtn.addEventListener('click', () => {
   if (selectedMerchant) navigateToMerchant(selectedMerchant);
 });
 merchantReturnBtn.addEventListener('click', returnToDongDong);
+merchantLinksCloseBtn.addEventListener('click', closeMerchantLinksSheet);
+merchantLinksBackdrop.addEventListener('click', closeMerchantLinksSheet);
 aiSendBtn.addEventListener('pointerdown', e => {
   if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return;
   e.preventDefault();
@@ -1641,7 +1719,12 @@ aiForm.addEventListener('submit', e => {
 });
 overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && radialMenu && radialMenu.classList.contains('is-open')) {
+  if (e.key !== 'Escape') return;
+  if (merchantLinksSheet && merchantLinksSheet.classList.contains('is-visible')) {
+    closeMerchantLinksSheet();
+    return;
+  }
+  if (radialMenu && radialMenu.classList.contains('is-open')) {
     closeRadialMenu();
   }
 });

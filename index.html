@@ -44,9 +44,9 @@
             <img src="assets/GO_LocateSelf.svg?v=42" alt="" aria-hidden="true">
             <span id="locateLabel" class="radial-action-label">我在哪</span>
           </button>
-          <button id="aiBtn" class="radial-action radial-action-dongdong" type="button" aria-label="問咚咚 / Ask DongDong">
+          <button id="aiBtn" class="radial-action radial-action-dongdong" type="button" aria-label="AI問咚咚 / Ask AI DongDong">
             <img src="assets/GO_DongDong.svg?v=42" alt="" aria-hidden="true">
-            <span id="aiBtnLabel" class="radial-action-label">問咚咚</span>
+            <span id="aiBtnLabel" class="radial-action-label">AI問咚咚</span>
           </button>
           <button id="sideBtn" class="radial-action radial-action-about" type="button" aria-label="關於">
             <img src="assets/GO_About.svg?v=42" alt="" aria-hidden="true">
@@ -74,6 +74,18 @@
             <input id="aiInput" class="ai-input" type="text" maxlength="1200" autocomplete="off" placeholder="想找什麼？" aria-label="Ask DongDong">
             <button id="aiSendBtn" class="ai-send-btn" type="submit">送出</button>
           </form>
+        </section>
+
+        <div id="merchantLinksBackdrop" class="merchant-links-backdrop" aria-hidden="true"></div>
+        <section id="merchantLinksSheet" class="merchant-links-sheet" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="merchantLinksTitle">
+          <header class="merchant-links-header">
+            <div>
+              <div id="merchantLinksTitle" class="merchant-links-title">官方網站與社群</div>
+              <div id="merchantLinksSubtitle" class="merchant-links-subtitle"></div>
+            </div>
+            <button id="merchantLinksCloseBtn" class="merchant-links-close" type="button" aria-label="關閉">×</button>
+          </header>
+          <div id="merchantLinksList" class="merchant-links-list"></div>
         </section>
 
         <div id="merchantFocusLayer" class="merchant-focus-layer" aria-hidden="true">

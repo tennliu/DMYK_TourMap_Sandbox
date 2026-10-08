@@ -1,0 +1,27 @@
+.mrt-assistant{flex:0 0 auto;padding:12px;background:#fff;border-bottom:1px solid rgba(145,0,0,.12);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.mrt-question{display:flex;align-items:baseline;gap:7px;color:#262626;font-size:13px;line-height:1.25}
+.mrt-question strong{font-size:14px;font-weight:900}
+.mrt-question span{color:#777;font-size:10.5px;font-weight:700}
+.mrt-line-choices{display:flex;gap:7px;overflow-x:auto;padding:9px 0 3px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.mrt-line-choices::-webkit-scrollbar{display:none}
+.mrt-line-choice{flex:0 0 auto;min-height:34px;border:2px solid transparent;border-radius:17px;padding:0 11px;background:var(--line-color);color:#fff;font-size:11px;font-weight:900;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.12);transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.mrt-line-choice.is-light{color:#342f1d}
+.mrt-line-choice.is-selected{border-color:#fff;box-shadow:0 0 0 2px var(--line-color),0 2px 8px rgba(0,0,0,.18);transform:translateY(-1px)}
+.mrt-assistant-status{margin-top:8px;color:#555;font-size:11px;line-height:1.35}
+.mrt-station-confirm,.mrt-station-picker,.mrt-route-summary{margin-top:9px;padding:10px;border:1px solid #eadada;border-radius:14px;background:#fffaf8}
+.mrt-station-confirm.is-hidden,.mrt-station-picker.is-hidden,.mrt-route-summary.is-hidden{display:none}
+.mrt-step-label{color:#8d7777;font-size:9.5px;font-weight:850}
+.mrt-nearest-station{margin-top:3px;color:#222;font-size:13px;font-weight:900;line-height:1.3}
+.mrt-nearest-distance{margin-top:2px;color:#777;font-size:10px;line-height:1.3}
+.mrt-inline-actions{display:flex;gap:7px;margin-top:8px}
+.mrt-small-btn{min-height:34px;border:1px solid #910000;border-radius:17px;padding:0 12px;background:#fff;color:#910000;font-size:10.5px;font-weight:850;cursor:pointer}
+.mrt-small-btn.primary{background:#910000;color:#fff}
+.mrt-station-picker label{display:block;margin-bottom:6px;color:#6d6060;font-size:10px;font-weight:800}
+.mrt-station-picker-row{display:flex;gap:7px;align-items:center}
+.mrt-station-picker select{flex:1;min-width:0;height:36px;border:1px solid #d8cccc;border-radius:10px;padding:0 9px;background:#fff;color:#222;font-size:11px}
+.mrt-route-lines{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mrt-route-badge{display:inline-flex;align-items:center;min-height:30px;border-radius:15px;padding:0 10px;background:var(--line-color);color:#fff;font-size:10.5px;font-weight:900}
+.mrt-route-badge.is-light{color:#342f1d}
+.mrt-route-arrow{color:#777;font-size:14px;font-weight:900}
+.mrt-route-text{margin-top:7px;color:#333;font-size:11px;line-height:1.45}
+.mrt-helper-note{margin-top:8px;color:#908585;font-size:9px;line-height:1.35}

@@ -171,6 +171,7 @@ const aiForm = document.getElementById('aiForm');
 const aiInput = document.getElementById('aiInput');
 const aiSendBtn = document.getElementById('aiSendBtn');
 const aiModeLabel = document.getElementById('aiModeLabel');
+const aiPanelTitle = document.getElementById('aiPanelTitle');
 const merchantFocusLayer = document.getElementById('merchantFocusLayer');
 const merchantFocusBeacon = document.getElementById('merchantFocusBeacon');
 const merchantFocusName = document.getElementById('merchantFocusName');
@@ -203,7 +204,7 @@ let appScale = 1;
 let stableViewportHeight = window.innerHeight;
 
 const LOCATION_ZOOM = 18;
-const LOCATION_HOLD_MS = 2000;
+const LOCATION_HOLD_MS = 2550;
 const LOCATION_RETURN_MS = 720;
 const AI_CLIENT_DAILY_LIMIT = 20;
 const MERCHANT_FOCUS_BEACON_MS = 2550;
@@ -416,10 +417,10 @@ function setLocateButton(mode = 'idle') {
   locateLabel.textContent = loading
     ? '定位中 / Locating…'
     : active
-      ? '我的位置 / You are here'
+      ? '我在這裡 / You are here'
       : returning
-        ? '返回中 / Returning…'
-        : '我的位置 / Locate Me';
+        ? '我在這裡 / You are here'
+        : '我在哪 / Where am I';
 }
 
 function centeredMapUrl(lat, lng) {
@@ -456,7 +457,6 @@ function finishLocationPeek(token) {
   if (!locationPeekActive || token !== locationPeekToken) return;
 
   locationBeacon.classList.remove('is-visible');
-  setLocateButton('returning');
   mapScreen.classList.remove('is-peeking');
   locationPeekLayer.classList.remove('is-visible');
 
@@ -466,8 +466,8 @@ function finishLocationPeek(token) {
     locationPeekLayer.setAttribute('aria-hidden','true');
     locationPeekFrame.src = '';
     setLocateButton('idle');
-    showLocationStatus('已回到原本瀏覽位置 / Back to previous map view', 1800);
-  }, LOCATION_RETURN_MS);
+    showLocationStatus('已定位在你的位置 / You are here', 1600);
+  }, 280);
 }
 
 function revealLocationPeek(position, token) {
@@ -506,8 +506,10 @@ function beginLocationPeek(position) {
   const token = ++locationPeekToken;
   let revealed = false;
 
+  const userMapUrl = centeredMapUrl(lat, lng);
+  mapFrame.src = userMapUrl;
   locationPeekLayer.setAttribute('aria-hidden','false');
-  locationPeekFrame.src = centeredMapUrl(lat, lng);
+  locationPeekFrame.src = userMapUrl;
 
   const revealOnce = () => {
     if (revealed || token !== locationPeekToken) return;
@@ -545,8 +547,8 @@ function startLocationPeek() {
     return;
   }
 
-  // The current base iframe is intentionally left untouched. Its live pan/zoom
-  // state is the returning anchor for this location peek.
+  // Recenter the base My Maps iframe on the current GPS fix. The temporary
+  // beacon overlay disappears, while the map remains centered on the user.
   setLocateButton('loading');
   showLocationStatus('正在取得位置 / Locating…', 0);
 
@@ -557,7 +559,15 @@ function startLocationPeek() {
   );
 }
 
+function refreshAiHeaderTitle() {
+  if (!aiPanelTitle) return;
+  const emojis = ['✨','🧭','🍜','☕️','🛍️','🎈','🌟'];
+  const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+  aiPanelTitle.textContent = '找地方？問咚咚 ' + emoji;
+}
+
 function openAiPanel() {
+  refreshAiHeaderTitle();
   aiPanel.classList.add('is-visible');
   aiBackdrop.classList.add('is-visible');
   aiPanel.setAttribute('aria-hidden','false');

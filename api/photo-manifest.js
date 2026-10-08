@@ -66,8 +66,9 @@ async function buildManifest(apiKey) {
     const childLists = await Promise.all(chunk.map(item => listFolder(item.folderId, apiKey)));
     childLists.forEach((children, index) => {
       const merchantId = chunk[index].merchantId;
+      const prefix = merchantId + '_';
       manifest[merchantId] = children
-        .filter(file => /^image\//.test(file.mimeType || ''))
+        .filter(file => /^image\//.test(file.mimeType || '') && String(file.name || '').startsWith(prefix))
         .sort((a,b) => photoOrder(a.name) - photoOrder(b.name) || a.name.localeCompare(b.name))
         .map(file => file.id);
     });

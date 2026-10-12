@@ -1,17 +1,36 @@
 (() => {
   const DATA = window.DMYK_MRT_DATA || {};
   const LINES = ['BR','R','G','O','BL','Y'];
-  const LINE_CLASS = {
-    BR:['cls-36'], R:['cls-31'], G:['cls-30'],
-    O:['cls-39'], BL:['cls-25','cls-16'], Y:['cls-45']
+  // SVG elements are tagged with stable data-dmyk-line/data-dmyk-network attributes.
+  const FADE_OPACITY = 0.10;
+  const MRT_LANGUAGES = new Set(['zh','en','ja','ko']);
+  const UI_COPY = {
+    zh: {origin:'出發站',route:'前往東門',line:'路線',station:'車站',chooseLine:'請先選擇路線',chooseStation:'請選擇車站',gps:'使用 GPS 或選擇路線及車站',ready:'已規劃',stops:n=>n+' 站',transfers:n=>n+' 次轉乘',title:'台北捷運',subtitle:'前往東門',startAria:'選擇捷運路線',stationAria:'選擇捷運車站'},
+    en: {origin:'Starting from',route:'Route to DMYK',line:'Line',station:'Station',chooseLine:'Select line first',chooseStation:'Select station',gps:'GPS or select line + station',ready:'Ready',stops:n=>n+(n===1?' stop':' stops'),transfers:n=>n+(n===1?' transfer':' transfers'),title:'Metro Taipei',subtitle:'Route to Dongmen',startAria:'Select MRT line',stationAria:'Select MRT station'},
+    ja: {origin:'出発駅',route:'東門へのルート',line:'路線',station:'駅',chooseLine:'路線を選択',chooseStation:'駅を選択',gps:'GPS または路線と駅を選択',ready:'経路を表示',stops:n=>n+' 駅',transfers:n=>n+' 回乗換',title:'台北MRT',subtitle:'東門へのルート',startAria:'MRT路線を選択',stationAria:'MRT駅を選択'},
+    ko: {origin:'출발역',route:'동먼 가는 길',line:'노선',station:'역',chooseLine:'노선을 먼저 선택',chooseStation:'역 선택',gps:'GPS 또는 노선과 역을 선택',ready:'경로 준비됨',stops:n=>n+'개 역',transfers:n=>n+'회 환승',title:'타이베이 MRT',subtitle:'동먼 가는 길',startAria:'MRT 노선 선택',stationAria:'MRT 역 선택'}
   };
-  const STATION_MARKER_CLASS = {
-    BR:'cls-36', R:'cls-31', G:'cls-30',
-    O:'cls-39', BL:'cls-16', Y:'cls-45'
+  // Only station names checked against the supplied official JP/KR network charts.
+  // Unverified labels must fall back to the English station name.
+  const OFFICIAL_NAMES = {
+    '江子翠': {ja:'江子翠',ko:'장쯔추이'}, '東門': {ja:'東門',ko:'동먼'},
+    '西門': {ja:'西門',ko:'시먼'}, '忠孝新生': {ja:'忠孝新生',ko:'중샤오 신성'},
+    '台北車站': {ja:'台北駅',ko:'타이베이역'},
+    '中正紀念堂': {ja:'中正紀念堂',ko:'중정 기념당'},
+    '古亭': {ja:'古亭',ko:'구팅'}, '板橋': {ja:'板橋',ko:'반차오'},
+    '龍山寺': {ja:'龍山寺',ko:'룽산사'}
   };
-  const FADE_OPACITY = 0.05;
+  function normalizeMrtLanguage(lang) { return MRT_LANGUAGES.has(lang)?lang:'en'; }
+  let mrtLanguage=normalizeMrtLanguage(window.DMYK_MRT_LANG || 'en');
+  function copy() {return UI_COPY[mrtLanguage]||UI_COPY.en;}
+  function nameFor(node) {
+    if(!node)return '';
+    if(mrtLanguage==='zh')return node.zh;
+    if(mrtLanguage==='en')return node.en;
+    return OFFICIAL_NAMES[node.zh]?.[mrtLanguage] || node.en;
+  }
   const GPS_MAX_DISTANCE = 3000;
-  const TRANSFER_COST = 0.2;
+  const TRANSFER_COST = 3.25; // Equivalent to 3.25 stops: prefer simpler transfers without extreme detours.
 
   const panel = document.getElementById('mrtPanel');
   const backdrop = document.getElementById('mrtBackdrop');
@@ -198,7 +217,7 @@
   originTop.className = 'mrt-v2-origin-top';
   const originTitle = document.createElement('div');
   originTitle.className = 'mrt-v2-origin-title';
-  originTitle.textContent = 'Starting from';
+  originTitle.textContent = copy().origin;
   const gpsBtn = document.createElement('button');
   gpsBtn.type = 'button';
   gpsBtn.className = 'mrt-v2-gps-btn';
@@ -217,13 +236,13 @@
 
   const status = document.createElement('div');
   status.className = 'mrt-v2-status';
-  status.textContent = 'GPS or select line + station';
+  status.textContent = copy().gps;
 
   const routeWrap = document.createElement('div');
   routeWrap.className = 'mrt-v2-route is-hidden';
   const routeHeading = document.createElement('div');
   routeHeading.className = 'mrt-v2-route-heading';
-  routeHeading.textContent = 'Route to DMYK';
+  routeHeading.textContent = copy().route;
   const routeCards = document.createElement('div');
   routeCards.className = 'mrt-v2-route-cards';
   routeWrap.append(routeHeading,routeCards);
@@ -241,12 +260,12 @@
     lineSelect.innerHTML = '';
     const placeholder = document.createElement('option');
     placeholder.value = '';
-    placeholder.textContent = 'Line';
+    placeholder.textContent = copy().line;
     lineSelect.appendChild(placeholder);
     for (const line of LINES) {
       const option = document.createElement('option');
       option.value = line;
-      option.textContent = line + ' · ' + meta(line).en;
+      option.textContent = line + ' · ' + (mrtLanguage==='zh'?meta(line).zh:meta(line).en);
       lineSelect.appendChild(option);
     }
     lineSelect.value = selectedLine;
@@ -257,13 +276,13 @@
     stationSelect.innerHTML = '';
     const placeholder = document.createElement('option');
     placeholder.value = '';
-    placeholder.textContent = line ? 'Station' : 'Select line first';
+    placeholder.textContent = line ? copy().station : copy().chooseLine;
     stationSelect.appendChild(placeholder);
     stationSelect.disabled = !line;
     for (const station of DATA.lines[line] || []) {
       const option = document.createElement('option');
       option.value = station.code;
-      option.textContent = station.code + ' · ' + station.en;
+      option.textContent = station.code + ' · ' + nameFor(station);
       stationSelect.appendChild(option);
     }
     stationSelect.value = selected;
@@ -273,9 +292,7 @@
     return nodes.get(nodeId(line,code)) || null;
   }
 
-  function stopsLabel(n) {
-    return n === 1 ? '1 stop' : n + ' stops';
-  }
+  function stopsLabel(n) { return copy().stops(n); }
 
   function textColor(line) {
     return line === 'Y' ? '#292414' : '#fff';
@@ -288,7 +305,8 @@
     card.style.color = textColor(node.line);
     const text = document.createElement('div');
     text.className = 'mrt-v2-card-main';
-    text.textContent = node.code + ' (' + node.en + ')';
+    text.textContent = node.code + ' (' + nameFor(node) + ')';
+    text.title = node.en;
     card.appendChild(text);
     if (isDestination) {
       const star = document.createElement('span');
@@ -317,7 +335,8 @@
 
     const name = document.createElement('span');
     name.className = 'mrt-v2-transfer-name';
-    name.textContent = fromNode.en;
+    name.textContent = nameFor(fromNode);
+    name.title = fromNode.en;
 
     card.append(left,right,name);
     return card;
@@ -373,7 +392,10 @@
 
     const lines = segments.map(s=>s.line);
     setMapHighlight(lines);
-    status.textContent = 'Ready · ' + startNode.code + ' ' + startNode.en;
+    const transferCount = Math.max(0,segments.length-1);
+    const stopCount = segments.reduce((sum,s)=>sum+s.stops,0);
+    routeHeading.textContent = copy().route + ' · ' + copy().transfers(transferCount) + ' · ' + copy().stops(stopCount);
+    status.textContent = copy().ready + ' · ' + startNode.code + ' ' + nameFor(startNode);
   }
 
   function selectStart(line,code,source='manual') {
@@ -384,8 +406,8 @@
     const start = stationNode(line,code);
     if (!start) return;
     status.textContent = source === 'gps'
-      ? 'GPS · ' + start.code + ' ' + start.en
-      : start.code + ' ' + start.en;
+      ? 'GPS · ' + start.code + ' ' + nameFor(start)
+      : start.code + ' ' + nameFor(start);
     renderRoute(start);
   }
 
@@ -442,73 +464,54 @@
   }
 
   function setupSvgEntities(doc) {
-    if (!doc || boundSvgDocument === doc) return;
-    boundSvgDocument = doc;
-    stationEntities = [];
-    const svg = doc.querySelector('svg');
-    if (!svg) return;
-    const mainGroup = [...svg.querySelectorAll('g')]
-      .find(group => group.children.length > 450);
-    if (!mainGroup) return;
-
-    const markers = [];
-    for (const group of mainGroup.children) {
-      if (group.tagName.toLowerCase() !== 'g') continue;
-      let line = '';
-      for (const [key,cls] of Object.entries(STATION_MARKER_CLASS)) {
-        if (group.querySelector('.'+cls) && group.querySelector('.cls-9')) {
-          line = key;
-          break;
-        }
-      }
-      if (!line) continue;
-      const center = bboxCenter(group);
-      if (!center) continue;
-      markers.push({element:group,line,...center});
-    }
-
-    const entities = new Map();
-    function assign(el,maxDistance=76) {
-      const container = directChildOf(mainGroup,el);
-      if (entities.has(container)) return;
-      const center = bboxCenter(container);
-      if (!center) return;
-      let best=null;
-      for (const marker of markers) {
-        const d=Math.hypot(center.x-marker.x,center.y-marker.y);
-        if (!best || d<best.d) best={line:marker.line,d};
-      }
-      if (best && best.d<=maxDistance) entities.set(container,best.line);
-    }
-
-    for (const el of doc.querySelectorAll('.cls-32')) assign(el,76);
-    for (const el of doc.querySelectorAll('.cls-28')) assign(el,48);
-
-    for (const marker of markers) entities.set(marker.element,marker.line);
-    stationEntities=[...entities.entries()].map(([element,line])=>({element,line}));
+    if(!doc || boundSvgDocument===doc)return;
+    boundSvgDocument=doc;
+    stationEntities=[];
   }
 
   function setMapHighlight(lines) {
     activeLines=[...new Set(lines||[])];
     const doc=mapObject.contentDocument;
-    if (!doc) return;
+    if(!doc)return;
     setupSvgEntities(doc);
+    const svg=doc.querySelector('svg');
+    if(!svg)return;
     const selected=new Set(activeLines);
     const active=selected.size>0;
-
-    for (const [line,classes] of Object.entries(LINE_CLASS)) {
-      for (const cls of classes) {
-        for (const el of doc.querySelectorAll('.'+cls)) {
-          el.style.transition='opacity .22s ease';
-          el.style.opacity=active&&!selected.has(line)?String(FADE_OPACITY):'1';
-        }
-      }
+    for(const el of svg.querySelectorAll('[data-dmyk-line],[data-dmyk-network]')) {
+      const line=el.getAttribute('data-dmyk-line');
+      el.style.transition='opacity .22s ease';
+      el.style.opacity=(active && (!line || !selected.has(line))) ? String(FADE_OPACITY) : '1';
     }
-    for (const item of stationEntities||[]) {
-      item.element.style.transition='opacity .22s ease';
-      item.element.style.opacity=active&&!selected.has(item.line)?String(FADE_OPACITY):'1';
+    // Native-outline station labels and the basemap remain readable.
+    // The SVG keeps dedicated route and locale overlay groups for segment-level upgrades.
+    const labelLayer=svg.querySelector('#dmyk-label-layer');
+    if(labelLayer)labelLayer.setAttribute('data-language',mrtLanguage);
+  }
+
+  function localizeUI() {
+    const t=copy();
+    originTitle.textContent=t.origin;
+    lineSelect.setAttribute('aria-label',t.startAria);
+    stationSelect.setAttribute('aria-label',t.stationAria);
+    panel.querySelector('.mrt-panel-title').textContent=t.title;
+    panel.querySelector('.mrt-panel-subtitle').textContent=t.subtitle;
+    fillLineSelect();
+    fillStationSelect(selectedLine,selectedStation);
+    if(selectedLine && selectedStation) {
+      const node=stationNode(selectedLine,selectedStation);
+      if(node)renderRoute(node);
+    } else {
+      routeHeading.textContent=t.route;
+      status.textContent=selectedLine?t.chooseStation:t.gps;
+      setMapHighlight([]);
     }
   }
+
+  window.addEventListener('dmyk:languagechange',(event)=>{
+    mrtLanguage=normalizeMrtLanguage(event.detail?.language);
+    localizeUI();
+  });
 
   function reset() {
     selectedLine='';
@@ -516,7 +519,7 @@
     fillLineSelect();
     fillStationSelect('');
     routeWrap.classList.add('is-hidden');
-    status.textContent='GPS or select line + station';
+    status.textContent=copy().gps;
     setMapHighlight([]);
     if (lastPosition) {
       const nearest=nearestNode(lastPosition);
@@ -536,7 +539,7 @@
     fillStationSelect(selectedLine);
     routeWrap.classList.add('is-hidden');
     setMapHighlight([]);
-    status.textContent=selectedLine?'Select station':'GPS or select line + station';
+    status.textContent=selectedLine?copy().chooseStation:copy().gps;
   });
 
   stationSelect.addEventListener('change',()=>{
@@ -560,6 +563,5 @@
   document.addEventListener('gesturechange',stopGesture,{passive:false});
   document.addEventListener('gestureend',stopGesture,{passive:false});
 
-  fillLineSelect();
-  fillStationSelect('');
+  localizeUI();
 })();

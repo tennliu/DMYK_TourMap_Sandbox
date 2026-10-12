@@ -238,12 +238,13 @@
   const routeHeading = document.createElement('div');
   routeHeading.className = 'mrt-v2-route-heading';
   routeHeading.textContent = copy().route;
-  const routeCards = document.createElement('div');
-  routeCards.className = 'mrt-v2-route-cards';
-  routeWrap.append(routeHeading,routeCards);
+  routeWrap.appendChild(routeHeading);
 
   assistant.append(originTop,selectors,status,routeWrap);
   panel.insertBefore(assistant,mapStage);
+  const simpleRouteView = window.DMYK_MRT_SIMPLE?.mount({
+    panel,mapStage,getMeta:meta,getName:nameFor,getLanguage:()=>mrtLanguage,getCopy:copy
+  });
 
   function setLineSelectAppearance() {
     const m = selectedLine ? meta(selectedLine) : null;
@@ -287,110 +288,31 @@
     return nodes.get(nodeId(line,code)) || null;
   }
 
-  function stopsLabel(n) { return copy().stops(n); }
-
-  function textColor(line) {
-    return line === 'Y' ? '#292414' : '#fff';
-  }
-
-  function singleCard(node,isDestination=false) {
-    const card = document.createElement('div');
-    card.className = 'mrt-v2-card single' + (isDestination ? ' destination' : '');
-    card.style.setProperty('--card-color',meta(node.line).color);
-    card.style.color = textColor(node.line);
-    const text = document.createElement('div');
-    text.className = 'mrt-v2-card-main';
-    text.textContent = node.code + ' (' + nameFor(node) + ')';
-    text.title = node.en;
-    card.appendChild(text);
-    if (isDestination) {
-      const star = document.createElement('span');
-      star.className = 'mrt-v2-destination-star';
-      star.textContent = '★';
-      card.appendChild(star);
-    }
-    return card;
-  }
-
-  function transferCard(fromNode,toNode) {
-    const card = document.createElement('div');
-    card.className = 'mrt-v2-card transfer';
-    card.style.setProperty('--from-color',meta(fromNode.line).color);
-    card.style.setProperty('--to-color',meta(toNode.line).color);
-
-    const left = document.createElement('span');
-    left.className = 'mrt-v2-transfer-code left';
-    left.style.color = textColor(fromNode.line);
-    left.textContent = fromNode.code;
-
-    const right = document.createElement('span');
-    right.className = 'mrt-v2-transfer-code right';
-    right.style.color = textColor(toNode.line);
-    right.textContent = toNode.code;
-
-    const name = document.createElement('span');
-    name.className = 'mrt-v2-transfer-name';
-    name.textContent = nameFor(fromNode);
-    name.title = fromNode.en;
-
-    card.append(left,right,name);
-    return card;
-  }
-
-  function connector(stops) {
-    const el = document.createElement('div');
-    el.className = 'mrt-v2-connector';
-    const up = document.createElement('span');
-    up.textContent = '▼';
-    const label = document.createElement('span');
-    label.textContent = stopsLabel(stops);
-    const down = document.createElement('span');
-    down.textContent = '▼';
-    el.append(up,label,down);
-    return el;
-  }
-
   function renderRoute(startNode) {
     const route = shortestPath(startNode.id);
-    if (!route) {
+    if(!route) {
       routeWrap.classList.add('is-hidden');
-      status.textContent = 'Route unavailable';
+      simpleRouteView?.clear();
+      status.textContent='Route unavailable';
       setMapHighlight([]);
       return;
     }
-    const segments = segmentsFromPath(route.nodes);
-    routeCards.innerHTML = '';
+    const segments=segmentsFromPath(route.nodes);
     routeWrap.classList.remove('is-hidden');
 
-    let firstSegment = 0;
-    if (segments.length > 1 && segments[0].stops === 0) {
-      routeCards.appendChild(transferCard(segments[0].start,segments[1].start));
-      firstSegment = 1;
-    } else {
-      routeCards.appendChild(singleCard(segments[0].start,false));
-    }
-
-    for (let i=firstSegment;i<segments.length;i++) {
-      const seg = segments[i];
-      if (seg.stops > 0) routeCards.appendChild(connector(seg.stops));
-      if (i < segments.length-1) {
-        routeCards.appendChild(transferCard(seg.end,segments[i+1].start));
-      } else {
-        if (seg.stops > 0 || routeCards.children.length === 0) {
-          routeCards.appendChild(singleCard(seg.end,true));
-        } else {
-          const last = routeCards.lastElementChild;
-          last?.classList.add('destination');
-        }
-      }
-    }
-
-    const lines = segments.map(s=>s.line);
+    // Shared routing data drives BOTH map highlighting and the simple card view.
+    // Keep the SVG laid out while rebuilding its route when Simple Route is open.
+    const wasHidden=mapStage.hidden;
+    if(wasHidden)mapStage.hidden=false;
+    const lines=segments.map(s=>s.line);
     setMapHighlight(lines,route.nodes);
-    const transferCount = Math.max(0,segments.length-1);
-    const stopCount = segments.reduce((sum,s)=>sum+s.stops,0);
-    routeHeading.textContent = copy().route + ' · ' + copy().transfers(transferCount) + ' · ' + copy().stops(stopCount);
-    status.textContent = copy().ready + ' · ' + startNode.code + ' ' + nameFor(startNode);
+    if(wasHidden)mapStage.hidden=true;
+    simpleRouteView?.render(segments);
+
+    const transferCount=Math.max(0,segments.length-1);
+    const stopCount=segments.reduce((sum,s)=>sum+s.stops,0);
+    routeHeading.textContent=copy().route+' · '+copy().transfers(transferCount)+' · '+copy().stops(stopCount);
+    status.textContent=copy().ready+' · '+startNode.code+' '+nameFor(startNode);
   }
 
   function selectStart(line,code,source='manual') {
@@ -430,6 +352,7 @@
       if (!nearest || nearest.meters > GPS_MAX_DISTANCE) {
         status.textContent = 'Not near Taipei MRT · select line + station';
         routeWrap.classList.add('is-hidden');
+        simpleRouteView?.clear();
         setMapHighlight([]);
         return;
       }
@@ -504,12 +427,14 @@
     panel.querySelector('.mrt-panel-subtitle').textContent=t.subtitle;
     fillLineSelect();
     fillStationSelect(selectedLine,selectedStation);
+    simpleRouteView?.localize();
     if(selectedLine && selectedStation) {
       const node=stationNode(selectedLine,selectedStation);
       if(node)renderRoute(node);
     } else {
       routeHeading.textContent=t.route;
       status.textContent=selectedLine?t.chooseStation:t.gps;
+      simpleRouteView?.clear();
       setMapHighlight([]);
     }
   }
@@ -525,6 +450,7 @@
     fillLineSelect();
     fillStationSelect('');
     routeWrap.classList.add('is-hidden');
+    simpleRouteView?.reset();
     status.textContent=copy().gps;
     setMapHighlight([]);
     if (lastPosition) {
@@ -544,6 +470,7 @@
     setLineSelectAppearance();
     fillStationSelect(selectedLine);
     routeWrap.classList.add('is-hidden');
+    simpleRouteView?.clear();
     setMapHighlight([]);
     status.textContent=selectedLine?copy().chooseStation:copy().gps;
   });

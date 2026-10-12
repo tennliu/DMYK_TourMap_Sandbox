@@ -37,7 +37,7 @@ window.DMYK_MRT_FOCUS = {
     for(const n of itinerary) {
       const p=positions[n.code];if(!p)continue;
       const c=abs(p),hole=make('circle');
-      Object.entries({cx:c.x,cy:c.y,r:7.3,fill:'#000'}).forEach(([k,v])=>hole.setAttribute(k,String(v)));
+      Object.entries({cx:c.x,cy:c.y,r:Object.values(window.DMYK_MRT_DATA?.lines||{}).flat().filter(st=>st.zh===n.zh).length>1?13:8.4,fill:'#000'}).forEach(([k,v])=>hole.setAttribute(k,String(v)));
       mask.appendChild(hole);
     }
     const tracks=make('g');

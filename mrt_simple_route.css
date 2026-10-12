@@ -1,0 +1,67 @@
+
+/* Route Card 261012: white cards, colored outlines, vertical line, bicolor transfer. */
+body > .mrt-panel .mrt-map-stage[hidden]{display:none!important}
+body > .mrt-panel .mrt-v2-simple-stage[hidden]{display:none!important}
+.mrt-v2-view-switch{
+  flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4px;
+  padding:7px 12px;background:#f8eee8;border-bottom:1px solid #e9d7ce;
+}
+.mrt-v2-view-btn{
+  min-height:39px;border:1px solid #d8c3ba;background:#fff;color:#755650;
+  border-radius:10px;font:800 12px/1.2 -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;
+  cursor:pointer;transition:background .18s,border-color .18s,color .18s;
+  -webkit-tap-highlight-color:transparent;
+}
+.mrt-v2-view-btn[aria-pressed="true"]{background:#910000;border-color:#910000;color:#fff}
+.mrt-v2-view-btn:disabled{color:#aaa3a0;background:#f5f0ed;border-color:#ede4df;cursor:default}
+.mrt-v2-view-btn:focus-visible{outline:2px solid #910000;outline-offset:2px}
+body > .mrt-panel .mrt-v2-simple-stage{
+  flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;background:#fff;
+  padding:22px 10px calc(35px + env(safe-area-inset-bottom));
+}
+.mrt-v2-simple-list{
+  display:flex;flex-direction:column;align-items:center;
+  width:min(100%,425px);margin:0 auto;padding:0 8px;
+}
+.mrt-v2-simple-card{
+  box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  width:min(94%,350px);min-height:62px;padding:11px 14px;
+  border:5px solid var(--route-color,#910000);border-radius:12px;
+  background:#fff;color:var(--route-ink,#910000);
+  font-size:clamp(15px,3.7vw,19px);font-weight:850;line-height:1.23;
+  box-shadow:none;
+}
+.mrt-v2-simple-card-title{min-width:0;overflow-wrap:anywhere}
+.mrt-v2-simple-destination-star{color:#e60012;font-size:24px;line-height:1;flex:none}
+.mrt-v2-simple-connector{
+  box-sizing:border-box;position:relative;display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:59px;color:#6d5d57;
+}
+.mrt-v2-simple-connector::before{
+  content:"";position:absolute;left:50%;top:0;bottom:0;
+  width:6px;transform:translateX(-50%);background:var(--route-color,#910000);
+}
+.mrt-v2-simple-stop-count,.mrt-v2-simple-transfer-label{
+  box-sizing:border-box;position:absolute;left:calc(50% + 18px);
+  padding:4px 9px;max-width:calc(50% - 23px);
+  border-radius:11px;background:#fff;color:#6d5d57;
+  font-size:11px;font-weight:800;line-height:1.2;white-space:normal;
+}
+.mrt-v2-simple-connector.is-transfer{min-height:50px}
+.mrt-v2-simple-connector.is-transfer::before{
+  background:linear-gradient(to bottom,var(--from-color) 0 50%,var(--to-color) 50% 100%);
+}
+.mrt-v2-simple-transfer-dot{
+  position:absolute;z-index:1;left:50%;top:50%;
+  transform:translate(-50%,-50%);width:27px;height:27px;border-radius:50%;
+  border:3px solid #fff;
+  background:conic-gradient(from -90deg,var(--from-color) 0 50%,var(--to-color) 50% 100%);
+  box-shadow:0 0 0 1px #c7b4aa;
+}
+.mrt-v2-simple-transfer-label{color:#55453e}
+@media(max-width:380px){
+  .mrt-v2-simple-card{width:96%;padding:9px 11px;min-height:58px;font-size:15px}
+  .mrt-v2-simple-connector{min-height:53px}
+  .mrt-v2-view-switch{padding:6px 9px}
+}

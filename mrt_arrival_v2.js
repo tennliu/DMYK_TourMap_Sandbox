@@ -42,6 +42,7 @@
   let gpsTried = false;
   let gpsRequestToken = 0;
   let activeLines = [];
+  let activeRouteNodes = [];
   let stationEntities = null;
   let boundSvgDocument = null;
 
@@ -385,7 +386,7 @@
     }
 
     const lines = segments.map(s=>s.line);
-    setMapHighlight(lines);
+    setMapHighlight(lines,route.nodes);
     const transferCount = Math.max(0,segments.length-1);
     const stopCount = segments.reduce((sum,s)=>sum+s.stops,0);
     routeHeading.textContent = copy().route + ' · ' + copy().transfers(transferCount) + ' · ' + copy().stops(stopCount);
@@ -463,8 +464,9 @@
     stationEntities=[];
   }
 
-  function setMapHighlight(lines) {
+  function setMapHighlight(lines,routeNodes=[]) {
     activeLines=[...new Set(lines||[])];
+    activeRouteNodes=routeNodes||[];
     const doc=mapObject.contentDocument;
     if(!doc)return;
     setupSvgEntities(doc);
@@ -472,15 +474,20 @@
     if(!svg)return;
     const selected=new Set(activeLines);
     const active=selected.size>0;
-    for(const el of svg.querySelectorAll('[data-dmyk-line],[data-dmyk-network]')) {
+    const exact=active && !!window.DMYK_MRT_FOCUS?.paint(
+      doc,activeRouteNodes,mrtLanguage,OFFICIAL_NAMES,meta);
+    if(!exact){
+      svg.querySelector('#dmyk-route-layer')?.replaceChildren();
+      const labelLayer=svg.querySelector('#dmyk-label-layer');
+      if(labelLayer){labelLayer.replaceChildren();labelLayer.setAttribute('data-language',mrtLanguage);}
+    }
+    for(const el of svg.querySelectorAll('[data-dmyk-line],[data-dmyk-network]')){
       const line=el.getAttribute('data-dmyk-line');
       el.style.transition='opacity .22s ease';
-      el.style.opacity=(active && (!line || !selected.has(line))) ? String(FADE_OPACITY) : '1';
+      el.style.opacity=(active && (exact || !line || !selected.has(line)))
+        ? String(FADE_OPACITY) : '1';
     }
-    // Native-outline station labels and the basemap remain readable.
-    // The SVG keeps dedicated route and locale overlay groups for segment-level upgrades.
-    const labelLayer=svg.querySelector('#dmyk-label-layer');
-    if(labelLayer)labelLayer.setAttribute('data-language',mrtLanguage);
+    svg.setAttribute('data-dmyk-route-focus',exact?'segments':active?'lines':'none');
   }
 
   function localizeUI() {
@@ -543,7 +550,7 @@
   });
 
   gpsBtn.addEventListener('click',()=>useGps(true));
-  mapObject.addEventListener('load',()=>setMapHighlight(activeLines));
+  mapObject.addEventListener('load',()=>setMapHighlight(activeLines,activeRouteNodes));
   trigger.addEventListener('click',reset);
 
   // Do not let browser-level pinch/pan move the whole DMYK canvas.

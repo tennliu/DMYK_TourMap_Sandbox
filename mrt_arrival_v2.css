@@ -38,7 +38,7 @@ body > .mrt-panel .mrt-close-btn{width:36px;height:36px;font-size:23px}
 .mrt-v2-connector span:last-child{justify-self:start;font-size:8px;color:#c9b7ae}
 
 body > .mrt-panel .mrt-map-stage{flex:1;min-height:210px;overflow:auto;overscroll-behavior:contain;background:#fbdac8;touch-action:pan-y;-webkit-overflow-scrolling:touch}
-body > .mrt-panel .mrt-map-object{display:block;width:100%;height:auto;aspect-ratio:595.28/963.23;border:0;background:#fbdac8;pointer-events:none}
+body > .mrt-panel .mrt-map-object{display:block;width:100%;height:auto;aspect-ratio:595.28/936.23;border:0;background:#fbdac8;pointer-events:none}
 
 @media(max-height:700px){
   .mrt-arrival-v2{max-height:62dvh}

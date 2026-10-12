@@ -10,16 +10,10 @@
     ja: {origin:'出発駅',route:'東門へのルート',line:'路線',station:'駅',chooseLine:'路線を選択',chooseStation:'駅を選択',gps:'GPS または路線と駅を選択',ready:'経路を表示',stops:n=>n+' 駅',transfers:n=>n+' 回乗換',title:'台北MRT',subtitle:'東門へのルート',startAria:'MRT路線を選択',stationAria:'MRT駅を選択'},
     ko: {origin:'출발역',route:'동먼 가는 길',line:'노선',station:'역',chooseLine:'노선을 먼저 선택',chooseStation:'역 선택',gps:'GPS 또는 노선과 역을 선택',ready:'경로 준비됨',stops:n=>n+'개 역',transfers:n=>n+'회 환승',title:'타이베이 MRT',subtitle:'동먼 가는 길',startAria:'MRT 노선 선택',stationAria:'MRT 역 선택'}
   };
-  // Only station names checked against the supplied official JP/KR network charts.
-  // Unverified labels must fall back to the English station name.
-  const OFFICIAL_NAMES = {
-    '江子翠': {ja:'江子翠',ko:'장쯔추이'}, '東門': {ja:'東門',ko:'동먼'},
-    '西門': {ja:'西門',ko:'시먼'}, '忠孝新生': {ja:'忠孝新生',ko:'중샤오 신성'},
-    '台北車站': {ja:'台北駅',ko:'타이베이역'},
-    '中正紀念堂': {ja:'中正紀念堂',ko:'중정 기념당'},
-    '古亭': {ja:'古亭',ko:'구팅'}, '板橋': {ja:'板橋',ko:'반차오'},
-    '龍山寺': {ja:'龍山寺',ko:'룽산사'}
-  };
+  // Official-verified labels live separately from routing and graphics.
+  const LOCALIZED = window.DMYK_MRT_LOCALE_DATA || {};
+  const OFFICIAL_NAMES = LOCALIZED.stations || {};
+  const OFFICIAL_LINE_NAMES = LOCALIZED.lines || {};
   function normalizeMrtLanguage(lang) { return MRT_LANGUAGES.has(lang)?lang:'en'; }
   let mrtLanguage=normalizeMrtLanguage(window.DMYK_MRT_LANG || 'en');
   function copy() {return UI_COPY[mrtLanguage]||UI_COPY.en;}
@@ -27,7 +21,7 @@
     if(!node)return '';
     if(mrtLanguage==='zh')return node.zh;
     if(mrtLanguage==='en')return node.en;
-    return OFFICIAL_NAMES[node.zh]?.[mrtLanguage] || node.en;
+    return OFFICIAL_NAMES[node.code]?.[mrtLanguage] || node.en;
   }
   const GPS_MAX_DISTANCE = 3000;
   const TRANSFER_COST = 3.25; // Equivalent to 3.25 stops: prefer simpler transfers without extreme detours.
@@ -265,7 +259,7 @@
     for (const line of LINES) {
       const option = document.createElement('option');
       option.value = line;
-      option.textContent = line + ' · ' + (mrtLanguage==='zh'?meta(line).zh:meta(line).en);
+      option.textContent = line + ' · ' + (OFFICIAL_LINE_NAMES[line]?.[mrtLanguage] || (mrtLanguage==='zh'?meta(line).zh:meta(line).en));
       lineSelect.appendChild(option);
     }
     lineSelect.value = selectedLine;

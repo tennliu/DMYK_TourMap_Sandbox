@@ -481,11 +481,16 @@
       const labelLayer=svg.querySelector('#dmyk-label-layer');
       if(labelLayer){labelLayer.replaceChildren();labelLayer.setAttribute('data-language',mrtLanguage);}
     }
-    for(const el of svg.querySelectorAll('[data-dmyk-line],[data-dmyk-network]')){
-      const line=el.getAttribute('data-dmyk-line');
-      el.style.transition='opacity .22s ease';
-      el.style.opacity=(active && (exact || !line || !selected.has(line)))
-        ? String(FADE_OPACITY) : '1';
+    // Control station outline names, badge numbers and legend artwork as
+    // complete SVG groups; preserving the map's original graphic alignment.
+    if(window.DMYK_MRT_VISUAL){
+      window.DMYK_MRT_VISUAL.apply(doc,activeLines,active);
+    } else {
+      for(const el of svg.querySelectorAll('[data-dmyk-line],[data-dmyk-network]')){
+        const line=el.getAttribute('data-dmyk-line');
+        el.style.transition='opacity .22s ease';
+        el.style.opacity=(active && (!line || !selected.has(line)))?String(FADE_OPACITY):'1';
+      }
     }
     svg.setAttribute('data-dmyk-route-focus',exact?'segments':active?'lines':'none');
   }

@@ -58,7 +58,7 @@
         if(!b || !markers.length)return ['other'];
         const ranked=markers.map(m=>({...m,d:nearDistance(b,m.b)})).sort((a,b)=>a.d-b.d);
         if(ranked[0].d>55)return ['other'];
-        return [...new Set(ranked.filter(m=>m.d<=Math.max(10,Math.min(22,ranked[0].d+6)))
+        return [...new Set(ranked.filter(m=>m.d<=Math.max(12,Math.min(55,ranked[0].d+7)))
           .flatMap(m=>m.lines))];
       };
       const add=(el,role,lines,white=false)=>{

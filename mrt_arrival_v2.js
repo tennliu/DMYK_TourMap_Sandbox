@@ -27,6 +27,7 @@
   let selectedStation = '';
   let lastPosition = null;
   let gpsTried = false;
+  let gpsRequestToken = 0;
   let activeLines = [];
   let stationEntities = null;
   let boundSvgDocument = null;
@@ -389,6 +390,7 @@
   }
 
   async function useGps(force=false) {
+    const token = ++gpsRequestToken;
     if (!navigator.geolocation) {
       status.textContent = 'GPS unavailable · select manually';
       return;
@@ -405,6 +407,7 @@
           enableHighAccuracy:true,maximumAge:30000,timeout:9000
         });
       });
+      if (token !== gpsRequestToken) return;
       lastPosition = {lat:pos.coords.latitude,lng:pos.coords.longitude};
       const nearest = nearestNode(lastPosition);
       if (!nearest || nearest.meters > GPS_MAX_DISTANCE) {
@@ -526,6 +529,7 @@
   }
 
   lineSelect.addEventListener('change',()=>{
+    gpsRequestToken += 1;
     selectedLine=lineSelect.value;
     selectedStation='';
     setLineSelectAppearance();
@@ -536,6 +540,7 @@
   });
 
   stationSelect.addEventListener('change',()=>{
+    gpsRequestToken += 1;
     selectedStation=stationSelect.value;
     if (selectedLine&&selectedStation) selectStart(selectedLine,selectedStation,'manual');
   });

@@ -194,6 +194,7 @@ const merchantNavigateDistance = document.getElementById('merchantNavigateDistan
 const merchantReturnBtn = document.getElementById('merchantReturnBtn');
 
 let currentLang = 'zh';
+window.DMYK_MRT_LANG = 'zh';
 let conversationLang = 'zh';
 let locationStatusTimer = null;
 let locationPeekTimer = null;
@@ -392,6 +393,8 @@ function openMap(lang) {
   exitMerchantFocus();
   cancelLocationPeek(true);
   currentLang = lang;
+  window.DMYK_MRT_LANG = ['zh','en','ja','ko'].includes(lang) ? lang : 'en';
+  window.dispatchEvent(new CustomEvent('dmyk:languagechange',{detail:{language:window.DMYK_MRT_LANG}}));
   conversationLang = lang;
   applyOverlayCopy(lang);
   closeAiPanel();
@@ -1849,4 +1852,4 @@ shareBtn.addEventListener('click', async () => {
 });
 
 
-import('./mrt_arrival_v2.js?v=50').catch(() => {});
+import('./mrt_arrival_v2.js?v=51').catch(() => {});

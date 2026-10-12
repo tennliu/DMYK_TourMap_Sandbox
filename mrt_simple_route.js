@@ -6,10 +6,10 @@
 (() => {
   'use strict';
   const LABELS = {
-    zh:{map:'路網圖',simple:'簡易路線',transfer:'轉乘',empty:'請先選擇出發站'},
-    en:{map:'Map View',simple:'Simple Route',transfer:'Transfer',empty:'Select a starting station'},
-    ja:{map:'路線図',simple:'簡易ルート',transfer:'乗換',empty:'出発駅を選択してください'},
-    ko:{map:'노선도',simple:'간편 경로',transfer:'환승',empty:'출발역을 선택하세요'}
+    zh:{map:'路網圖',simple:'簡易路線',transfer:'轉乘',destination:'目的地',empty:'請先選擇出發站'},
+    en:{map:'Map View',simple:'Simple Route',transfer:'Transfer',destination:'Destination',empty:'Select a starting station'},
+    ja:{map:'路線図',simple:'簡易ルート',transfer:'乗換',destination:'目的地',empty:'出発駅を選択してください'},
+    ko:{map:'노선도',simple:'간편 경로',transfer:'환승',destination:'목적지',empty:'출발역을 선택하세요'}
   };
   const readableInk = (line, color) => (
     line==='Y' ? '#605000' : line==='O' ? '#975100' : color
@@ -91,7 +91,7 @@
         const star=document.createElement('span');
         star.className='mrt-v2-simple-destination-star';
         star.textContent='★';
-        star.setAttribute('aria-label','Destination');
+        star.setAttribute('aria-label',locale().destination);
         card.appendChild(star);
       }
       return card;
@@ -102,7 +102,7 @@
       setColor(connector,step.line);
       const count=document.createElement('span');
       count.className='mrt-v2-simple-stop-count';
-      count.textContent=getCopy().stops(step.count);
+      count.textContent='▼ '+getCopy().stops(step.count)+' ▼';
       connector.appendChild(count);
       return connector;
     }

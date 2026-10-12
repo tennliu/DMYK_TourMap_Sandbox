@@ -1,4 +1,4 @@
-@import url("mrt_arrival_v2.css?v=49");
+@import url("mrt_arrival_v2.css?v=51");
 :root{--master:390px;--outer:#5f0008;--page-red:#910000}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;min-height:100%;background:var(--outer);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Noto Sans",Arial,sans-serif}
@@ -236,4 +236,4 @@ body.map-active .phone-shell{min-height:0}
 .mrt-panel-subtitle{margin-top:3px;color:#666;font-size:11px;line-height:1.3}
 .mrt-close-btn{flex:0 0 auto;width:38px;height:38px;border:0;border-radius:50%;background:#f2f2f2;color:#333;font-size:25px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .mrt-map-stage{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#fbdac8;touch-action:pan-x pan-y}
-.mrt-map-object{display:block;width:100%;height:auto;aspect-ratio:595.28/841.89;border:0;background:#fbdac8;pointer-events:none}
+.mrt-map-object{display:block;width:100%;height:auto;aspect-ratio:595.28/936.23;border:0;background:#fbdac8;pointer-events:none}

@@ -406,7 +406,9 @@
     }
     // Control station outline names, badge numbers and legend artwork as
     // complete SVG groups; preserving the map's original graphic alignment.
-    if(window.DMYK_MRT_VISUAL){
+    if(window.DMYK_MRT_VISUAL_261013?.prepare(doc)){
+      window.DMYK_MRT_VISUAL_261013.apply(doc,activeLines,active,activeRouteNodes,exact);
+    } else if(window.DMYK_MRT_VISUAL){
       window.DMYK_MRT_VISUAL.apply(doc,activeLines,active);
     } else {
       for(const el of svg.querySelectorAll('[data-dmyk-line],[data-dmyk-network]')){

@@ -397,8 +397,11 @@
     if(!svg)return;
     const selected=new Set(activeLines);
     const active=selected.size>0;
-    const exact=active && !!window.DMYK_MRT_FOCUS?.paint(
-      doc,activeRouteNodes,mrtLanguage,OFFICIAL_NAMES,meta);
+    // Focus actual ridden station-to-station artwork rather than an entire
+    // participating line. The old 620x975 review-render overlay is deliberately
+    // bypassed: it can miss BL segments after the 261013 Illustrator re-export.
+    const exact=active && !!window.DMYK_MRT_VISUAL_261013?.canFocus?.(
+      doc,activeRouteNodes);
     if(!exact){
       svg.querySelector('#dmyk-route-layer')?.replaceChildren();
       const labelLayer=svg.querySelector('#dmyk-label-layer');

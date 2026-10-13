@@ -387,17 +387,17 @@ const disclaimerBackBtn = document.getElementById('disclaimerBackBtn');
 const disclaimerTitle = document.getElementById('disclaimerTitle');
 const disclaimerBody = document.getElementById('disclaimerBody');
 const disclaimerCopy = {
-  zh: {button:'使用聲明 Disclaimer ›', title:'使用聲明 Disclaimer', back:'‹ 返回關於', body:["本導覽工具由台北市東門永康商圈發展協會提供，旨在推廣會員店家，並非對店家進行評鑑或背書。店家之營運、服務及商品資訊，均以店家實際公告為準。所有圖像僅供說明與參考示意，部分內容透過 AI 輔助製作，雖以實際地點、物件及商品為參考，仍可能存在差異或錯誤，請以實際情況為準。","使用者授權之 GPS 定位資訊僅用於本工具內估算距離及規劃路徑。本導覽工具為台北市東門永康商圈發展協會所有，店家商品資訊、影像等內容之相關權利仍歸各權利人所有。","本工具之捷運路網系統以臺北捷運公司公開發布之路網圖為基礎進行改作，所提供之路徑規劃僅供建議參考，並非官方捷運服務；實際搭乘路線、營運服務、票價及其他相關資訊，請以捷運營運單位最新公告為準。"]},
-  en: {button:'Disclaimer ›',title:'Disclaimer',back:'‹ Back to About',body:["This guide is provided by the Taipei Dongmen YongKang District Development Association to promote member businesses. It is not an assessment or endorsement of individual merchants. Business operations, services and product information are subject to each merchant’s actual announcements. All images are illustrative and for reference only. Some materials were produced with AI assistance using real locations, objects or products as references, and may contain differences or errors. Actual conditions prevail.","GPS location information provided with the user’s permission is used within this tool to estimate distances and plan routes. This guide belongs to the Taipei Dongmen YongKang District Development Association. Rights to merchant product information, photographs and other third-party content remain with their respective rights holders.","The metro route network in this tool is adapted from a network map publicly released by Taipei Metro. Suggested journeys are for reference only and do not constitute an official metro service. For actual routes, operations, fares and related information, refer to the latest announcements of the relevant metro operator."]}
+  button:'使用聲明',
+  title:'使用聲明',
+  back:'返回關於',
+  body:["本導覽工具由台北市東門永康商圈發展協會提供，旨在推廣會員店家，並非對店家進行評鑑或背書。店家之營運、服務及商品資訊，均以店家實際公告為準。所有圖像僅供說明與參考示意，部分內容透過 AI 輔助製作，雖以實際地點、物件及商品為參考，仍可能存在差異或錯誤，請以實際情況為準。","使用者授權之 GPS 定位資訊僅用於本工具內估算距離及規劃路徑。本導覽工具為台北市東門永康商圈發展協會所有，店家商品資訊、影像等內容之相關權利仍歸各權利人所有。","本工具之捷運路網系統以臺北捷運公司公開發布之路網圖為基礎進行改作，所提供之路徑規劃僅供建議參考，並非官方捷運服務；實際搭乘路線、營運服務、票價及其他相關資訊，請以捷運營運單位最新公告為準。"]
 };
-// Legal-language translations are not inferred. Until reviewed, use the English notice.
-function disclaimerLanguage() { return currentLang === 'zh' ? 'zh' : 'en'; }
+// The approved Chinese usage notice is shown regardless of the map language.
 function applyDisclaimerCopy(){
-  const t=disclaimerCopy[disclaimerLanguage()];
-  disclaimerBtn.textContent=t.button;
-  disclaimerTitle.textContent=t.title;
-  disclaimerBackBtn.textContent=t.back;
-  disclaimerBody.replaceChildren(...t.body.map(paragraph=>{
+  disclaimerBtn.textContent=disclaimerCopy.button;
+  disclaimerTitle.textContent=disclaimerCopy.title;
+  disclaimerBackBtn.textContent=disclaimerCopy.back;
+  disclaimerBody.replaceChildren(...disclaimerCopy.body.map(paragraph=>{
     const p=document.createElement('p');
     p.textContent=paragraph;
     return p;

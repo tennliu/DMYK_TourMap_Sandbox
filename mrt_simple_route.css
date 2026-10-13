@@ -70,7 +70,7 @@ body > .mrt-panel .mrt-v2-simple-stage{
 .mrt-v2-simple-card{position:relative;display:block;width:min(96%,350px);min-height:0;height:auto;aspect-ratio:176.13/53.1;border:0;border-radius:0;overflow:visible;padding:0;background:transparent;color:var(--route-color);box-shadow:none;flex-shrink:0}
 .mrt-v2-simple-card[data-shape="passing"]{aspect-ratio:176.13/62.52}
 .mrt-v2-simple-card .mrt-v2-art-svg{position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible}
-.mrt-v2-simple-card-title{position:absolute;box-sizing:border-box;left:8%;right:7%;top:0;height:82.27%;display:flex;align-items:center;justify-content:flex-start;text-align:left;font-size:clamp(15px,5.5vw,24px);font-weight:850;line-height:1.11;letter-spacing:-.025em;color:var(--route-color);overflow-wrap:anywhere;overflow:hidden;padding:0}
+.mrt-v2-simple-card-title{position:absolute;box-sizing:border-box;left:8%;right:8%;top:0;height:82.27%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(15px,5.5vw,24px);font-weight:850;line-height:1.11;letter-spacing:-.025em;color:var(--route-color);overflow-wrap:anywhere;overflow:hidden;padding:0}
 .mrt-v2-simple-card[data-shape="passing"] .mrt-v2-simple-card-title{top:15.06%;height:69.88%}
 .mrt-v2-simple-card[data-shape="end"] .mrt-v2-simple-card-title{top:17.74%;height:82.26%}
 .mrt-v2-simple-card.is-long .mrt-v2-simple-card-title{font-size:clamp(13px,4.3vw,19px)}
@@ -80,3 +80,13 @@ body > .mrt-panel .mrt-v2-simple-stage{
 .mrt-v2-simple-connector::before{width:9px}
 .mrt-v2-simple-transfer-art{position:relative;z-index:2;display:block;width:35px;height:35px;overflow:visible;filter:drop-shadow(0 0 0.5px #fff)}
 .mrt-v2-simple-transfer-label{z-index:2}
+
+/* Route-card desktop seam correction. Browser fractional SVG scaling can leave
+   a faint line where the card stems meet a separate connector element.
+   Preserve mobile spacing and overlap desktop connectors by 1px per end. */
+@media (min-width:768px){
+  .mrt-v2-simple-list > .mrt-v2-simple-connector{
+    margin-top:-1px;
+    margin-bottom:-1px;
+  }
+}

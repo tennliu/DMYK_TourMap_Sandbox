@@ -9,7 +9,7 @@ body{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .phone-shell{position:relative;width:var(--master);min-height:100svh;background:var(--page-red);overflow:visible;transform-origin:top left;will-change:transform}
 .language-screen{position:relative;min-height:820px;overflow:visible;background:var(--page-red)}
 .map-screen{position:absolute;inset:0;overflow:hidden;background:var(--page-red)}
-.language-bg{position:absolute;top:0;left:-20.72px;width:446.37px;height:853.48px;max-width:none;pointer-events:none;user-select:none;object-fit:cover}
+.language-bg{position:absolute;top:0;left:0;width:390px;height:844px;max-width:none;pointer-events:none;user-select:none;object-fit:fill}
 .language-header{position:absolute;z-index:2;top:20px;left:50%;width:240px;height:auto;transform:translateX(-50%);text-align:center;color:#fff;pointer-events:none;user-select:none}
 .language-brand{display:block;width:206.76px;height:auto;margin:0 auto 14px}
 .guide-title-zh{font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;font-size:20px;line-height:1.25;letter-spacing:.02em}

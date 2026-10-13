@@ -1,0 +1,26 @@
+name: MRT Exact Route QA
+
+on:
+  push:
+    branches:
+      - preview/ai-qa-v1
+    paths:
+      - 'data/mrt_exact_261013.js'
+      - 'data/mrt_stations.js'
+      - 'mrt_arrival_v2.js'
+      - 'tests/mrt_exact_focus_261013.cjs'
+      - '.github/workflows/mrt-exact-route.yml'
+  workflow_dispatch:
+
+jobs:
+  route-mapping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JavaScript syntax
+        run: |
+          node --check data/mrt_exact_261013.js
+          node --check mrt_arrival_v2.js
+          node --check data/mrt_stations.js
+      - name: Verify all 135 station mappings and journeys
+        run: node tests/mrt_exact_focus_261013.cjs

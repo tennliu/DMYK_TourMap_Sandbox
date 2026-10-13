@@ -17,7 +17,7 @@ body > .mrt-panel .mrt-v2-simple-stage[hidden]{display:none!important}
 .mrt-v2-view-btn:focus-visible{outline:2px solid #910000;outline-offset:2px}
 body > .mrt-panel .mrt-v2-simple-stage{
   flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;touch-action:pan-y;background:#fff;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;background:#310000;
   padding:22px 10px calc(35px + env(safe-area-inset-bottom));
 }
 .mrt-v2-simple-list{

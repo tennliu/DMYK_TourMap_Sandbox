@@ -116,8 +116,12 @@
   }
   function canFocus(doc,itinerary){
     const s=stateOf(doc);
-    if(!s||!Array.isArray(itinerary)||itinerary.length<2)return false;
+    if(!s||!Array.isArray(itinerary)||!itinerary.length)return false;
     if(!itinerary.every(n=>xref[n.code]&&s.points.has(n.code)))return false;
+    // Starting at Dongmen means zero ridden segments; keep only the
+    // destination marker bright instead of illuminating the entire red line.
+    if(itinerary.length===1)
+      return itinerary[0].code==='R07'||itinerary[0].code==='O06';
     return itinerary.some((n,i)=>i&&n.line===itinerary[i-1].line);
   }
   function clear(s){

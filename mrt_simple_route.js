@@ -11,9 +11,6 @@
     ja:{map:'路線図',simple:'簡易ルート',transfer:'乗換',destination:'目的地',empty:'出発駅を選択してください'},
     ko:{map:'노선도',simple:'간편 경로',transfer:'환승',destination:'목적지',empty:'출발역을 선택하세요'}
   };
-  const readableInk = (line, color) => (
-    line==='Y' ? '#605000' : line==='O' ? '#975100' : color
-  );
   function stepsFromSegments(segments) {
     if(!Array.isArray(segments)||!segments.length)return [];
     const steps=[{kind:'station',node:segments[0].start}];
@@ -64,7 +61,7 @@
     const setColor=(el,line)=>{
       const m=getMeta(line);
       el.style.setProperty('--route-color',m.color);
-      el.style.setProperty('--route-ink',readableInk(line,m.color));
+      el.style.setProperty('--route-ink',m.color);
     };
     function selectView(requested) {
       currentView=requested==='simple'&&hasRoute?'simple':'map';
@@ -77,25 +74,29 @@
       // Persist map scroll and SVG state when toggling; never reload <object>.
       if(!mapActive)simpleStage.scrollTop=0;
     }
-    function stationStep(step) {
+    function stationStep(step,isFirst=false) {
       const m=step.node;
+      const kind=step.destination?'end':isFirst?'start':'passing';
+      const art=window.DMYK_MRT_ARTWORK;
+      const label=getName(m);
+      if(art?.station) {
+        const card=art.station(kind,m.code,label,getMeta(m.line).color);
+        if(step.destination)card.classList.add('is-destination');
+        return card;
+      }
+      // Non-blocking fallback if a user has a cached page without the new asset.
       const card=document.createElement('div');
-      card.className='mrt-v2-simple-card'+(step.destination?' is-destination':'');
+      card.className='mrt-v2-simple-card is-fallback';
       card.dataset.station=m.code;
+      card.dataset.shape=kind;
       setColor(card,m.line);
       const text=document.createElement('span');
       text.className='mrt-v2-simple-card-title';
-      text.textContent=m.code+' '+getName(m);
+      text.textContent=m.code+' '+label;
       card.appendChild(text);
-      if(step.destination) {
-        const star=document.createElement('span');
-        star.className='mrt-v2-simple-destination-star';
-        star.textContent='★';
-        star.setAttribute('aria-label',locale().destination);
-        card.appendChild(star);
-      }
       return card;
     }
+
     function rideStep(step){
       const connector=document.createElement('div');
       connector.className='mrt-v2-simple-connector is-ride';
@@ -109,24 +110,33 @@
     function transferStep(step){
       const connector=document.createElement('div');
       connector.className='mrt-v2-simple-connector is-transfer';
-      connector.style.setProperty('--from-color',getMeta(step.from).color);
-      connector.style.setProperty('--to-color',getMeta(step.to).color);
-      const dot=document.createElement('span');
-      dot.className='mrt-v2-simple-transfer-dot';
-      dot.setAttribute('aria-hidden','true');
+      const fromColor=getMeta(step.from).color;
+      const toColor=getMeta(step.to).color;
+      connector.style.setProperty('--from-color',fromColor);
+      connector.style.setProperty('--to-color',toColor);
+      const art=window.DMYK_MRT_ARTWORK?.transit?.(fromColor,toColor);
+      if(art)connector.appendChild(art);
+      else {
+        const dot=document.createElement('span');
+        dot.className='mrt-v2-simple-transfer-dot';
+        dot.setAttribute('aria-hidden','true');
+        connector.appendChild(dot);
+      }
       const note=document.createElement('span');
       note.className='mrt-v2-simple-transfer-label';
       note.textContent=locale().transfer;
-      connector.append(dot,note);
+      connector.appendChild(note);
       connector.setAttribute('aria-label',locale().transfer);
       return connector;
     }
+
     function draw() {
       routeList.replaceChildren();
-      for(const step of stepsFromSegments(segments)){
-        routeList.appendChild(step.kind==='station'?stationStep(step):
+      const steps=stepsFromSegments(segments);
+      steps.forEach((step,i)=>{
+        routeList.appendChild(step.kind==='station'?stationStep(step,i===0):
           step.kind==='ride'?rideStep(step):transferStep(step));
-      }
+      });
     }
     function localize(){
       const l=locale();

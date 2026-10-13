@@ -387,17 +387,83 @@ const disclaimerBackBtn = document.getElementById('disclaimerBackBtn');
 const disclaimerTitle = document.getElementById('disclaimerTitle');
 const disclaimerBody = document.getElementById('disclaimerBody');
 const disclaimerCopy = {
-  button:'使用聲明',
-  title:'使用聲明',
-  back:'返回關於',
-  body:["本導覽工具由台北市東門永康商圈發展協會提供，旨在推廣會員店家，並非對店家進行評鑑或背書。店家之營運、服務及商品資訊，均以店家實際公告為準。所有圖像僅供說明與參考示意，部分內容透過 AI 輔助製作，雖以實際地點、物件及商品為參考，仍可能存在差異或錯誤，請以實際情況為準。","使用者授權之 GPS 定位資訊僅用於本工具內估算距離及規劃路徑。本導覽工具為台北市東門永康商圈發展協會所有，店家商品資訊、影像等內容之相關權利仍歸各權利人所有。","本工具之捷運路網系統以臺北捷運公司公開發布之路網圖為基礎進行改作，所提供之路徑規劃僅供建議參考，並非官方捷運服務；實際搭乘路線、營運服務、票價及其他相關資訊，請以捷運營運單位最新公告為準。"]
+  "zh": {
+    "button": "使用聲明",
+    "title": "使用聲明",
+    "back": "返回關於",
+    "body": [
+      "本導覽工具由台北市東門永康商圈發展協會提供，旨在推廣會員店家，並非對店家進行評鑑或背書。店家之營運、服務及商品資訊，均以店家實際公告為準。所有圖像僅供說明與參考示意，部分內容透過 AI 輔助製作，雖以實際地點、物件及商品為參考，仍可能存在差異或錯誤，請以實際情況為準。",
+      "使用者授權之 GPS 定位資訊僅用於本工具內估算距離及規劃路徑。本導覽工具為台北市東門永康商圈發展協會所有，店家商品資訊、影像等內容之相關權利仍歸各權利人所有。",
+      "本工具之捷運路網系統以臺北捷運公司公開發布之路網圖為基礎進行改作，所提供之路徑規劃僅供建議參考，並非官方捷運服務；實際搭乘路線、營運服務、票價及其他相關資訊，請以捷運營運單位最新公告為準。"
+    ]
+  },
+  "en": {
+    "button": "Disclaimer",
+    "title": "Disclaimer",
+    "back": "Back to About",
+    "body": [
+      "This guide is provided by the Taipei Dongmen YongKang District Development Association to promote member businesses, not to evaluate or endorse them. Information on each merchant’s operations, services and products is subject to that merchant’s own announcements. All images are illustrative and for reference only. Some content was created with AI assistance using actual locations, objects or products as references and may contain inaccuracies or differences. Actual conditions prevail.",
+      "GPS location information shared with the user’s permission is used within this tool to estimate distances and plan routes. The guide belongs to the Taipei Dongmen YongKang District Development Association; rights to merchants’ product information, images and other third-party materials remain with their respective rights holders.",
+      "This tool’s metro network diagram is adapted from a network map published by Taipei Metro. Route suggestions are for reference only and are not an official metro service. For actual routes, operating services, fares and related information, please consult the latest announcements from the relevant metro operator."
+    ]
+  },
+  "ja": {
+    "button": "ご利用上の注意",
+    "title": "ご利用上の注意",
+    "back": "「概要」に戻る",
+    "body": [
+      "本ガイドは台北市東門永康商圏発展協会が加盟店舗の紹介を目的として提供するものであり、各店舗の評価や推奨・保証を意味するものではありません。営業、サービス、商品に関する情報は各店舗の案内を優先してください。画像は説明・参考用のイメージです。一部の内容は実際の場所、物品、商品を参考にAIを利用して作成しており、実物との相違や誤りが生じる可能性があります。実際の状況をご確認ください。",
+      "利用者の許可を得て取得したGPS位置情報は、本ツール内で距離の推定と経路の計画にのみ使用します。本ガイドは台北市東門永康商圏発展協会に帰属しますが、店舗の商品情報、画像などの権利はそれぞれの権利者に帰属します。",
+      "本ツールの地下鉄路線図は、台北MRTが公開した路線図を基に制作しています。経路案内は参考情報であり、鉄道事業者の公式サービスではありません。実際の乗車経路、運行状況、運賃などは、運行事業者の最新の公式情報をご確認ください。"
+    ]
+  },
+  "ko": {
+    "button": "이용 안내",
+    "title": "이용 안내",
+    "back": "소개로 돌아가기",
+    "body": [
+      "본 안내 도구는 타이베이시 동먼융캉 상권발전협회가 회원 업소를 홍보하기 위해 제공하며, 개별 업소에 대한 평가나 보증·추천을 의미하지 않습니다. 영업, 서비스 및 상품 정보는 해당 업소의 실제 공지를 기준으로 합니다. 모든 이미지는 설명과 참고를 위한 예시입니다. 일부 콘텐츠는 실제 장소, 물건 또는 상품을 참고하여 AI의 도움으로 제작되었으며 차이나 오류가 있을 수 있으므로 실제 상황을 확인하시기 바랍니다.",
+      "사용자의 동의를 받아 제공된 GPS 위치 정보는 본 도구 내에서 거리 추정 및 경로 계획에만 사용됩니다. 본 안내 도구는 타이베이시 동먼융캉 상권발전협회에 속하지만, 업소의 상품 정보와 이미지 등 제3자 자료에 관한 권리는 각 권리자에게 있습니다.",
+      "본 도구의 지하철 노선도는 타이베이 MRT가 공개한 노선도를 바탕으로 제작되었습니다. 제공되는 경로는 참고용이며 공식 지하철 안내 서비스가 아닙니다. 실제 탑승 경로, 운행 서비스, 요금 및 기타 정보는 해당 운영기관의 최신 공식 공지를 확인하시기 바랍니다."
+    ]
+  },
+  "th": {
+    "button": "ข้อจำกัดความรับผิดชอบ",
+    "title": "ข้อจำกัดความรับผิดชอบ",
+    "back": "กลับไปหน้าเกี่ยวกับ",
+    "body": [
+      "คู่มือนี้จัดทำโดยสมาคมพัฒนาย่านการค้าตงเหมินหย่งคังแห่งไทเป เพื่อประชาสัมพันธ์ร้านค้าสมาชิก มิใช่การประเมิน รับรอง หรือรับประกันร้านค้า ข้อมูลการดำเนินงาน บริการ และสินค้าให้ยึดตามประกาศของแต่ละร้าน ภาพทั้งหมดใช้เพื่อประกอบคำอธิบายและเป็นตัวอย่างเท่านั้น เนื้อหาบางส่วนจัดทำโดยใช้ AI ช่วย โดยอ้างอิงสถานที่ สิ่งของ หรือสินค้าจริง จึงอาจมีความคลาดเคลื่อนหรือข้อผิดพลาด โปรดตรวจสอบสภาพจริง",
+      "ข้อมูลตำแหน่ง GPS ที่ผู้ใช้อนุญาตให้เข้าถึงจะใช้ภายในเครื่องมือนี้เพื่อประมาณระยะทางและวางแผนเส้นทางเท่านั้น คู่มือนี้เป็นของสมาคมพัฒนาย่านการค้าตงเหมินหย่งคังแห่งไทเป ส่วนสิทธิในข้อมูลสินค้า ภาพถ่าย และสื่อของบุคคลภายนอกยังคงเป็นของเจ้าของสิทธิแต่ละราย",
+      "แผนผังรถไฟฟ้าในเครื่องมือนี้ดัดแปลงจากแผนที่เครือข่ายที่เผยแพร่โดย Taipei Metro เส้นทางที่แนะนำมีไว้เพื่ออ้างอิงเท่านั้น ไม่ใช่บริการอย่างเป็นทางการของผู้ให้บริการรถไฟฟ้า สำหรับเส้นทางเดินรถ การให้บริการ ค่าโดยสาร และข้อมูลอื่น ๆ โปรดตรวจสอบประกาศล่าสุดจากผู้ให้บริการที่เกี่ยวข้อง"
+    ]
+  },
+  "vi": {
+    "button": "Tuyên bố miễn trừ trách nhiệm",
+    "title": "Tuyên bố miễn trừ trách nhiệm",
+    "back": "Quay lại Giới thiệu",
+    "body": [
+      "Công cụ hướng dẫn này do Hiệp hội Phát triển Khu thương mại Đông Môn – Vĩnh Khang, Đài Bắc cung cấp nhằm quảng bá các cửa hàng thành viên, không phải để đánh giá hay bảo chứng cho các cửa hàng. Thông tin về hoạt động, dịch vụ và sản phẩm phải căn cứ vào thông báo của từng cửa hàng. Mọi hình ảnh chỉ mang tính minh họa và tham khảo. Một số nội dung được tạo với sự hỗ trợ của AI dựa trên địa điểm, đồ vật hoặc sản phẩm thực tế nên có thể có sai sót hoặc khác biệt; vui lòng đối chiếu với thực tế.",
+      "Thông tin vị trí GPS được người dùng cho phép chỉ được sử dụng trong công cụ này để ước tính khoảng cách và lập lộ trình. Công cụ hướng dẫn thuộc Hiệp hội Phát triển Khu thương mại Đông Môn – Vĩnh Khang, Đài Bắc; quyền đối với thông tin sản phẩm, hình ảnh và tài liệu của bên thứ ba vẫn thuộc về các chủ sở hữu tương ứng.",
+      "Sơ đồ mạng lưới tàu điện trong công cụ này được điều chỉnh từ bản đồ mạng lưới công khai của Taipei Metro. Lộ trình gợi ý chỉ mang tính tham khảo và không phải dịch vụ chính thức của đơn vị vận hành. Đối với tuyến đi thực tế, dịch vụ vận hành, giá vé và thông tin liên quan, vui lòng tham khảo thông báo mới nhất của đơn vị vận hành tàu điện."
+    ]
+  },
+  "id": {
+    "button": "Pernyataan Penyangkalan",
+    "title": "Pernyataan Penyangkalan",
+    "back": "Kembali ke Tentang",
+    "body": [
+      "Panduan ini disediakan oleh Asosiasi Pengembangan Kawasan Perdagangan Dongmen YongKang Taipei untuk mempromosikan usaha anggota, bukan untuk menilai atau memberikan dukungan maupun jaminan atas usaha tersebut. Informasi operasional, layanan, dan produk mengikuti pengumuman masing-masing usaha. Semua gambar hanya untuk ilustrasi dan referensi. Sebagian konten dibuat dengan bantuan AI berdasarkan lokasi, objek, atau produk nyata, sehingga mungkin terdapat perbedaan atau kesalahan. Kondisi sebenarnya yang berlaku.",
+      "Informasi lokasi GPS yang diizinkan oleh pengguna hanya digunakan dalam alat ini untuk memperkirakan jarak dan merencanakan rute. Panduan ini dimiliki oleh Asosiasi Pengembangan Kawasan Perdagangan Dongmen YongKang Taipei, sedangkan hak atas informasi produk, gambar, dan materi pihak ketiga tetap berada pada pemegang hak masing-masing.",
+      "Diagram jaringan MRT dalam alat ini diadaptasi dari peta jaringan yang diterbitkan oleh Taipei Metro. Rekomendasi rute hanya untuk referensi dan bukan layanan resmi operator MRT. Untuk rute perjalanan, layanan operasional, tarif, serta informasi terkait, silakan merujuk pada pengumuman terbaru dari operator yang bersangkutan."
+    ]
+  }
 };
-// The approved Chinese usage notice is shown regardless of the map language.
 function applyDisclaimerCopy(){
-  disclaimerBtn.textContent=disclaimerCopy.button;
-  disclaimerTitle.textContent=disclaimerCopy.title;
-  disclaimerBackBtn.textContent=disclaimerCopy.back;
-  disclaimerBody.replaceChildren(...disclaimerCopy.body.map(paragraph=>{
+  const t=disclaimerCopy[currentLang] || disclaimerCopy.en;
+  disclaimerBtn.textContent=t.button;
+  disclaimerTitle.textContent=t.title;
+  disclaimerBackBtn.textContent=t.back;
+  disclaimerBody.replaceChildren(...t.body.map(paragraph=>{
     const p=document.createElement('p');
     p.textContent=paragraph;
     return p;

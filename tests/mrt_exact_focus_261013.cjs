@@ -70,9 +70,10 @@ function route(start){
   }
   return result;
 }
-assert.equal(nodes.size,135);
-assert.equal(Object.keys(xref).length,135);
+assert.equal(nodes.size,136);
+assert.equal(Object.keys(xref).length,136);
 for(const station of nodes.values())assert(xref[station.code],'Unmapped station '+station.code);
+assert.equal(xref.R01.index,76);
 assert.equal(xref.R07.index,235);
 assert.equal(xref.O06.index,235);
 assert.equal(xref.R06.index,146);
@@ -82,14 +83,14 @@ for(const sourceId of nodes.keys()){
   for(const stop of journey)assert(xref[stop.code],'Route references unmapped '+stop.code);
   const transfers=journey.reduce((sum,n,i)=>sum+(i&&journey[i-1].line!==n.line?1:0),0);
   const stops=journey.length-1-transfers;
-  if(['BL:BL03','BL:BL09','G:G04','BR:BR04'].includes(sourceId))
+  if(['BL:BL03','BL:BL09','G:G04','BR:BR04','R:R01'].includes(sourceId))
     summary.push({from:sourceId,transfers,stops});
 }
-const expected=new Map([['BL:BL03',[1,12]],['BL:BL09',[1,6]],['G:G04',[1,6]],['BR:BR04',[1,7]]]);
+const expected=new Map([['BL:BL03',[1,12]],['BL:BL09',[1,6]],['G:G04',[1,6]],['BR:BR04',[1,7]],['R:R01',[0,6]]]);
 for(const {from,transfers,stops} of summary){
   const [t,n]=expected.get(from);
   assert.equal(transfers,t,from+' transfers');
   assert.equal(stops,n,from+' stops');
 }
-console.log('PASS 135 station codes and all origin-to-Dongmen routes');
+console.log('PASS 136 station codes and all origin-to-Dongmen routes');
 for(const x of summary)console.log(x.from+' '+x.transfers+' transfer(s), '+x.stops+' stop(s)');

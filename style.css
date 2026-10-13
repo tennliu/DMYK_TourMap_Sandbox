@@ -250,8 +250,8 @@ body.map-active .phone-shell{min-height:0}
 .overlay.is-disclaimer-open .overlay-disclaimer-entry,
 .overlay.is-disclaimer-open .overlay-actions{display:none!important}
 .overlay.is-disclaimer-open .disclaimer-view{display:block}
-.disclaimer-nav{position:sticky;top:0;z-index:4;padding:12px 0 13px;background:var(--page-red);border-bottom:1px solid rgba(255,255,255,.33)}
-.disclaimer-back{display:block;margin:0 0 14px;padding:8px 0;border:0;background:transparent;color:#fff;font-size:15px;font-weight:700;cursor:pointer;text-align:left}
+.disclaimer-nav{padding:12px 0 13px;border-bottom:1px solid rgba(255,255,255,.33)}
+.disclaimer-back{display:block;width:100%;margin:10px 0 22px;text-align:center}
 .disclaimer-nav h2{font-size:20px;line-height:1.35;font-weight:700;margin:0}
 .disclaimer-body{padding:19px 0 12px;font-size:15px;line-height:1.85;white-space:normal;overflow-wrap:anywhere}
 .disclaimer-body p{margin:0 0 21px}

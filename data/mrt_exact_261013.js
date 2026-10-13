@@ -15,7 +15,7 @@
     BL:[73,161,160,159,158,157,185,175,174,173,162,143,95,163,119,96,97,98,99,102,100,101,83],
     BR:[80,125,124,123,122,121,120,126,145,119,118,117,164,116,115,114,129,128,127,113,112,111,110,83],
     G:[32,167,168,179,166,165,107,106,156,144,109,162,108,150,105,118,103,104,33],
-    O:[81,182,169,155,156,146,163,105,152,153,154,88,89,90,171,178,188,172,177,176,87],
+    O:[81,182,169,155,156,235,163,105,152,153,154,88,89,90,171,178,188,172,177,176,87],
     Y:[179,180,183,181,182,184,192,191,193,186,187,188,190,189]
   };
   const ORDER={
@@ -68,12 +68,8 @@
     if(state.points.has(code))return state.points.get(code);
     const info=xref[code];
     if(!info)return null;
-    // The prominent Dongmen destination star is not a station-code badge.
-    // Red-line R07 and orange-line O06 refer to the same interchange.
-    if(code==='O06'){
-      const p=codePoint(state,'R07');
-      if(p){state.points.set(code,p);return p;}
-    }
+    // Dongmen's two adjacent official R07/O06 code badges are both inside
+    // the dedicated destination group (root 235), at distinct track endpoints.
     const root=state.roots[info.index];
     if(!root)return null;
     const candidates=[];

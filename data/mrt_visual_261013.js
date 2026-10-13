@@ -45,8 +45,8 @@
       const p=el.cloneNode(false);
       p.setAttribute('d',pieces[i]);
       p.removeAttribute('id');
-      p.setAttribute('id',\`dmyk-seg-\${line}-\${rootIndex}-\${String(i).padStart(2,'0')}\`);
-      p.setAttribute('data-dmyk-segment',\`\${line}-\${rootIndex}-\${i}\`);
+      p.setAttribute('id',`dmyk-seg-${line}-${rootIndex}-${String(i).padStart(2,'0')}`);
+      p.setAttribute('data-dmyk-segment',`${line}-${rootIndex}-${i}`);
       group.appendChild(p);
     }
     el.replaceWith(group);

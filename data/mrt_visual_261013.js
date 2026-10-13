@@ -62,7 +62,7 @@
     for(let i=2;i<=237;i++){
       let el=original[i];
       if(!el)continue;
-      if(i===2 || i===234 || i===235)continue; // footer, QR, Dongmen marker remain visible
+      if(i===2 || i===235)continue; // footer and Dongmen marker remain visible; gondola artwork must fade
       const lines=linesOf(el);
       let role='other';
       if(TRACK_ROOTS.has(i)){

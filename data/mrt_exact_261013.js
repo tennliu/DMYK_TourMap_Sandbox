@@ -28,7 +28,7 @@
   const ADDITIONAL={
     'G03A':17,'R22A':86,
     'O50':91,'O51':92,'O52':93,'O53':94,'O54':85,
-    'R02':75,'R03':148,'R04':147,'R05':145,'R06':146,
+    'R01':76,'R02':75,'R03':148,'R04':147,'R05':145,'R06':146,
     'R07':235,'R08':144,'R09':151,'R10':143,'R11':150,'R12':149,
     'R13':154,'R14':130,'R15':131,'R16':132,'R17':133,'R18':134,
     'R19':135,'R20':136,'R21':138,'R22':139,'R23':140,'R24':142,
@@ -58,6 +58,9 @@
     const codes=byRoot.get(info.index)||[];
     codes.push(code);byRoot.set(info.index,codes);
   }
+  // R01's terminal red 'R' pictogram is an independent Illustrator group.
+  // Focus it together with the R01 badge and outlined station name.
+  byRoot.set(16,['R01']);
   const states=new WeakMap();
   const box=el=>{try{
     const b=el.getBBox();

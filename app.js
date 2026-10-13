@@ -1852,4 +1852,4 @@ shareBtn.addEventListener('click', async () => {
 });
 
 
-import('./mrt_arrival_v2.js?v=66').catch(() => {});
+import('./mrt_arrival_v2.js?v=69').catch(() => {});
